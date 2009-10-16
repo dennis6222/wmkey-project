@@ -6,11 +6,17 @@ unit CIEBHO;
 
 interface
 
+
+
 uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
 	ActnList, IniFiles;
+
+const
+  DEBUG_MODE = True;
+
 type
 	TTIEAdvBHO = class(TComObject, IObjectWithSite, IDispatch)
 	private
@@ -54,6 +60,31 @@ const
 implementation
 
 uses ComServ, Sysutils, ComConst;
+
+
+procedure DebugInfo(info:String);
+const
+  DEBUG_FILE = 'c:\bhoinfo.txt';
+var
+  s:TStringList;
+begin
+  // debug info to the disk.
+
+  try
+    s:= TStringList.Create;
+    if FileExists(DEBUG_FILE) then
+      s.LoadFromFile(DEBUG_FILE);
+    s.Add(info);
+    s.Add(#13#10);
+    s.SaveToFile(DEBUG_FILE);
+  finally
+
+    s.Free;
+  end;
+
+
+end;
+
 
 { TTIEAdvBHO }
 
@@ -195,6 +226,9 @@ var
 	InputName, InputValue: string;
 begin
 
+
+ if DEBUG_MODE then DebugInfo('Start Analysis  ' + IEURL);
+
  if Copy(IEURL,1,4) = 'http' then
  begin
 	havepws := false;
@@ -213,6 +247,9 @@ begin
 			InputElement) then
 			if (InputElement.type_ = 'password') then
 			begin
+
+        if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
+
 				InputName := InputElement.name;
 				havepws := true;
 				if application.MessageBox('是否要填入密码？','提示',MB_OKCANCEL) = 1 then
@@ -255,6 +292,7 @@ begin
 			InputElement) then
 			if (InputElement.type_ = 'password') then
 			begin
+        if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
 				if havepws then
 				begin
 					if application.MessageBox('是否要要保存密码？','提示',MB_OKCANCEL) = 1 then

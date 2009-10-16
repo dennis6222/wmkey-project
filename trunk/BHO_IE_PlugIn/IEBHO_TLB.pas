@@ -12,16 +12,16 @@ unit IEBHO_TLB;
 // ************************************************************************ //
 
 // $Rev: 8291 $
-// File generated on 2009-10-14 8:30:18 from Type Library described below.
+// File generated on 2009-10-16 15:50:57 from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: C:\Documents and Settings\Administrator\×ÀÃæ\BHO_IE²å¼þ\IEBHO.tlb (1)
+// Type Lib: D:\Weiming\BHO_IE_PlugIn\IEBHO.tlb (1)
 // LIBID: {AC166DD1-E716-4ACC-8DAC-CA805486AB5F}
 // LCID: 0
 // Helpfile: 
 // HelpString: IEBHO Library
 // DepndLst: 
-//   (1) v2.0 stdole, (C:\WINDOWS\system32\STDOLE2.TLB)
+//   (1) v2.0 stdole, (C:\WINDOWS\system32\stdole2.tlb)
 // ************************************************************************ //
 {$TYPEDADDRESS OFF} // Unit must be compiled without type-checked pointers. 
 {$WARN SYMBOL_PLATFORM OFF}

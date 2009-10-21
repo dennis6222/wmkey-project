@@ -15,7 +15,7 @@ uses
 	ActnList, IniFiles;
 
 const
-  DEBUG_MODE = True;
+	DEBUG_MODE = True;
 
 type
 	TTIEAdvBHO = class(TComObject, IObjectWithSite, IDispatch)
@@ -24,10 +24,10 @@ type
 		FIE: IWebBrowser2;
 		FCPC: IConnectionPointContainer;
 		FCP: IConnectionPoint;
-		FCookie: Integer;
+		FCookie,FCookie1: Integer;
 
 		HtmlDocument: IHTMLDocument2;
-
+		FDP:IHTMLDocument2;
 		havepws: Boolean;
 		IEURL: String;
 	protected
@@ -49,38 +49,41 @@ type
 															var TargetFrameName: OleVariant; var PostData: OleVariant;
 															var Headers: OleVariant; var Cancel: WordBool);
 
-		procedure ActionLoadExecute;
+
+    procedure ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
+		procedure NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);
 //		procedure SubmitSave(var URL: OleVariant);
 		procedure SubmitSave;
 	end;
 
 const
 	Class_TIEAdvBHO: TGUID = '{D032570A-5F63-4812-A094-87D007C23012}';
+var
+	glpDisp: IDispatch = nil;
 
 implementation
 
 uses ComServ, Sysutils, ComConst;
 
-
 procedure DebugInfo(info:String);
 const
-  DEBUG_FILE = 'c:\bhoinfo.txt';
+	DEBUG_FILE = 'c:\bhoinfo.txt';
 var
-  s:TStringList;
+	s:TStringList;
 begin
-  // debug info to the disk.
+	// debug info to the disk.
 
-  try
-    s:= TStringList.Create;
-    if FileExists(DEBUG_FILE) then
-      s.LoadFromFile(DEBUG_FILE);
-    s.Add(info);
-    s.Add(#13#10);
-    s.SaveToFile(DEBUG_FILE);
-  finally
+	try
+		s:= TStringList.Create;
+		if FileExists(DEBUG_FILE) then
+			s.LoadFromFile(DEBUG_FILE);
+		s.Add(info);
+		s.Add(#13#10);
+		s.SaveToFile(DEBUG_FILE);
+	finally
 
-    s.Free;
-  end;
+		s.Free;
+	end;
 
 
 end;
@@ -91,6 +94,7 @@ end;
 procedure TTIEAdvBHO.DoBeforeNavigate2(const pDisp: IDispatch; var URL,
 	Flags, TargetFrameName, PostData, Headers: OleVariant;
 	var Cancel: WordBool);
+
 begin
 	IEURL := URL;
 end;
@@ -139,9 +143,9 @@ end;
 
 procedure BuildPositionalDispIds(pDispIds: PDispIdList; const dps: TDispParams);
 var
-  i: integer;
+	i: integer;
 begin
-  Assert(pDispIds <> nil);
+	Assert(pDispIds <> nil);
   for i := 0 to dps.cArgs - 1 do
 		pDispIds^[i] := dps.cArgs - 1 - i;
   if (dps.cNamedArgs <= 0) then
@@ -170,8 +174,8 @@ begin
 		GetMem(pDispIds, iDispIdsSize);
 	end;
   try
-    if (bHasParams) then
-      BuildPositionalDispIds(pDispIds, dps);
+		if (bHasParams) then
+			BuildPositionalDispIds(pDispIds, dps);
 		Result := S_OK;
 		case DispId of
 //      251://NEWWINDOW2事件ID
@@ -190,13 +194,19 @@ begin
 							POleVariant(dps.rgvarg^[pDispIds^[5]].pvarval)^,
 							dps.rgvarg^[pDispIds^[6]].pbool^);
 				end;
+			252:
+				begin
+					NavigateComplete2(IDispatch(dps.rgvarg^[pDispIds^[0]].dispval),
+              POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^);
+				end;
 			253://OnQuit事件ID
 				begin
 					FCP.Unadvise(FCookie);
 				end;
 			259:      //页面加载完成,判断是否有PWS输入框，并填写信息
 				begin
-					ActionLoadExecute;
+          ActionLoadExecute(IDispatch(dps.rgvarg^[pDispIds^[0]].dispval),
+              POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^);
 				end;
 				0:              //页面提交事件，保存密码信息。
 				begin
@@ -212,7 +222,7 @@ begin
 	end;
 end;
 
-procedure TTIEAdvBHO.ActionLoadExecute;  
+procedure TTIEAdvBHO.ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
 var
 	Section: string;
 	HtmlDocument: IHTMLDocument2;
@@ -224,45 +234,53 @@ var
 	InputElement: IHTMLInputElement;
 	I, J: Integer;
 	InputName, InputValue: string;
+	FormCount: Integer;
+	FIFG:IHTMLElementCollection;
+	FIFF: IHTMLFormElement;
 begin
+//FCP.Unadvise(FCookie);
+//if DEBUG_MODE then DebugInfo('Start Analysis  ' + IEURL);
 
-
- if DEBUG_MODE then DebugInfo('Start Analysis  ' + IEURL);
-
- if Copy(IEURL,1,4) = 'http' then
- begin
+if (Copy(IEURL,1,4) = 'http') or (Copy(IEURL,1,5) = 'about') then
+begin
 	havepws := false;
 	HtmlDocument := FIE.Document as IHTMLDocument2;
-	//只能设定第一个表单的内容
 	HtmlForms := HtmlDocument.forms;
-//	showmessage(inttostr(HtmlForms.length));
-	if HtmlForms.Length = 0 then
+ if HtmlForms.Length = 0 then
 		Exit;
-	HtmlForm := HtmlForms.item(0, 0) as IHTMLFormElement;
-	for I := 0 to HtmlForm.Length - 1 do
+ if (glpDisp <> nil) and (glpDisp = pDisp) then
+ begin
+	glpDisp := nil;
+	for FormCount := 0 to HtmlForms.length - 1 do
 	begin
-		ItemIndex := 0;
-		ItemName := I;
-		if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
-			InputElement) then
-			if (InputElement.type_ = 'password') then
-			begin
-
-        if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
-
-				InputName := InputElement.name;
-				havepws := true;
-				if application.MessageBox('是否要填入密码？','提示',MB_OKCANCEL) = 1 then
-					if inputbox('PIN码','请输入PIN码：','') = '123' then
-					begin
-						showmessage('输入正确！');
-						InputElement.Set_Value('admin');
-					end;
-			end
-			else if (InputElement.type_='submit') then
-				(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
-	end;
+		HtmlForm := HtmlForms.item(FormCount, 0) as IHTMLFormElement;
+		for I := 0 to HtmlForm.Length - 1 do
+		begin
+			ItemIndex := 0;
+			ItemName := I;
+			if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
+				InputElement) then
+				if (InputElement.type_ = 'password') then
+				begin
+//					if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
+					InputName := InputElement.name;
+					havepws := true;
+					if application.MessageBox('是否要填入密码？','提示',MB_OKCANCEL) = 1 then
+							InputElement.Set_Value('admin');
+				end
+				else if (InputElement.type_='submit') then
+					(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
+		end;
+	 end;
  end;
+end;
+end;
+
+procedure TTIEAdvBHO.NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);
+begin
+	 if   glpDisp = nil then
+		glpDisp := pDisp;
+
 end;
 //procedure TTIEAdvBHO.SubmitSave(var URL: OleVariant);
 procedure TTIEAdvBHO.SubmitSave;
@@ -279,7 +297,6 @@ var
 	InputName, InputValue: string;
 begin
 	HtmlDocument := FIE.Document as IHTMLDocument2;
-	//只能设定第一个表单的内容
 	HtmlForms := HtmlDocument.forms;
 	if HtmlForms.Length = 0 then
 		Exit;
@@ -292,12 +309,12 @@ begin
 			InputElement) then
 			if (InputElement.type_ = 'password') then
 			begin
-        if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
+//				if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
 				if havepws then
 				begin
 					if application.MessageBox('是否要要保存密码？','提示',MB_OKCANCEL) = 1 then
 					begin
-						showmessage(trim(IEURL));
+						showmessage(trim(HtmlDocument.url));
 						showmessage(InputElement.name);
 						showmessage(InputElement.value);
 						showmessage('保存成功');
@@ -318,6 +335,8 @@ var
 	InputElement: IHTMLInputElement;
 	I, J: Integer;
 	InputName, InputValue: string;
+	FIFG:IHTMLElementCollection;
+	FIFF: IHTMLFormElement;
 begin
 	Result := E_FAIL;
 	//保存接口
@@ -326,10 +345,21 @@ begin
 		Exit;
 	if not Supports(FIE, IConnectionPointContainer, FCPC) then
 		Exit;
-
+//	FCPC.FindConnectionPoint( DWebBrowserEvents2, FCP);
+//	FCP.Advise(Self, FCookie);
+{	if not Supports(FIE,IHTMLDocument2,FDP) then
+		Exit;
+	if not Supports(FDP,IHTMLElementCollection,FIFG) then
+		Exit;
+	if not Supports(FIFG,IHTMLFormElement,FIFF) then
+		Exit;
+	if not Supports(FIFF,IConnectionPointContainer,FCPC) then
+		Exit;     }
  //	挂接事件
 	FCPC.FindConnectionPoint(DWebBrowserEvents2, FCP);
 	FCP.Advise(Self, FCookie);
+//	FCPC.FindConnectionPoint( HTMLFormElementEvents2, FCP);
+//	FCP.Advise(Self, FCookie);
 	Result := S_OK;
 end;
 
@@ -368,7 +398,7 @@ end;
 type
   TIEAdvBHOFactory = class(TComObjectFactory)
   public
-    procedure UpdateRegistry(Register: Boolean); override;
+		procedure UpdateRegistry(Register: Boolean); override;
   end;
 
 { TIEAdvBHOFactory }

@@ -12,7 +12,7 @@ uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
-	ActnList, IniFiles, SQLiteTable3, DatebaseOpt;
+	ActnList, IniFiles, SQLiteTable3, DatabaseOpt;
 
 const
 	DEBUG_MODE = True;
@@ -235,7 +235,7 @@ var
 	I, J: Integer;
 	InputName, InputValue: string;
 	FormCount: Integer;
-	DatebaseOpt: TDatebaseOpt;
+	DatabaseOpt: TDatabaseOpt;
 	pws: TSQLIteTable;
 begin
 //FCP.Unadvise(FCookie);
@@ -267,9 +267,9 @@ begin
 			begin
 				havepws := True;
 			try
-        DatebaseOpt := TDatebaseOpt.Create;
-				if DatebaseOpt.OpenDatebase('config.dat','pwsinfo') then
-          pws := DatebaseOpt.SelectPws(HtmlDocument.url);
+				DatabaseOpt := TDatabaseOpt.Create;
+				if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
+					pws := DatabaseOpt.SelectPws(HtmlDocument.url);
         if pws.Count > 0 then
 				begin
 					if application.MessageBox('是否要自动填入密码信息？','提示',MB_OKCANCEL) = 1 then
@@ -290,7 +290,7 @@ begin
           end;
 				end;
       finally
-				DatebaseOpt.CloseDatebase;
+				DatabaseOpt.CloseDatabase;
 			end;
       end
       else if (InputElement.type_='submit') then
@@ -322,7 +322,7 @@ var
 	InputElement: IHTMLInputElement;
 	I, J: Integer;
 	InputName, InputValue: string;
-	DatebaseOpt: TDatebaseOpt;
+	DatabaseOpt: TDatabaseOpt;
 begin
 	HtmlDocument := FIE.Document as IHTMLDocument2;
 	HtmlForms := HtmlDocument.forms;
@@ -341,12 +341,12 @@ begin
       if(InputElement.type_ = 'password') then
 			begin
       	try
-					DatebaseOpt := TDatebaseOpt.Create;
-					if DatebaseOpt.OpenDatebase('config.dat','pwsinfo') then
+					DatabaseOpt := TDatabaseOpt.Create;
+					if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
 						if application.MessageBox('是否要保存密码信息？','提示',MB_OKCANCEL) = 1 then
-							DatebaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value);
+							DatabaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value);
 				finally
-					DatebaseOpt.CloseDatebase;
+					DatabaseOpt.CloseDatabase;
 				end;
 			end;
 		end;

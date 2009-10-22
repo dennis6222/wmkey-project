@@ -1,11 +1,11 @@
-unit DatebaseOpt;
+unit DatabaseOpt;
 
 interface
 
 uses
 	 Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, StdCtrls,SQLiteTable3, ExtCtrls;
-type TDatebaseOpt = Class
+type TDatabaseOpt = Class
 
 	private
 		sldb: TSQLiteDatabase;
@@ -13,15 +13,15 @@ type TDatebaseOpt = Class
 		slDBPath: String;
 		sSQL: String;
 	public
-		function OpenDatebase(DatebaseName:String;TableName:String):Boolean;
-		procedure CloseDatebase;
+		function OpenDatabase(DatebaseName:String;TableName:String):Boolean;
+		procedure CloseDatabase;
 		function SelectPws(URL:String):TSQLIteTable;
 		function InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
 
 End;
 implementation
 
-function TDatebaseOpt.OpenDatebase(DatebaseName:String;TableName:String):Boolean;
+function TDatabaseOpt.OpenDatabase(DatebaseName:String;TableName:String):Boolean;
 var
 	path: String;
 	hinst: HMODULE;
@@ -46,7 +46,7 @@ begin
 	result := true;
 end;
 
-function TDatebaseOpt.SelectPws(URL:String):TSQLIteTable;
+function TDatabaseOpt.SelectPws(URL:String):TSQLIteTable;
 var
 	selectString: String;
 begin
@@ -65,7 +65,7 @@ end;        }
 	result := sltb;
 end;
 
-function TDatebaseOpt.InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
+function TDatabaseOpt.InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
 begin
 //   showmessage(url+'||'+FormName +'||'+ UserName +'||'+ UserPws);
 	sldb.BeginTransaction;
@@ -80,7 +80,7 @@ begin
 	result := true;
 end;
 
-procedure TDatebaseOpt.CloseDatebase;
+procedure TDatabaseOpt.CloseDatabase;
 begin
 	sltb.Free;
 	sldb.Free;

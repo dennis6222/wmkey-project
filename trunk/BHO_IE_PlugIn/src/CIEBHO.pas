@@ -12,7 +12,7 @@ uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
-	ActnList, IniFiles;
+	ActnList, IniFiles, SQLiteTable3, DatebaseOpt;
 
 const
 	DEBUG_MODE = True;
@@ -28,8 +28,8 @@ type
 
 		HtmlDocument: IHTMLDocument2;
 		FDP:IHTMLDocument2;
-		havepws: Boolean;
 		IEURL: String;
+    havepws,savepws:Boolean;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -231,19 +231,20 @@ var
 	FormName: WideString;
 	Name, Index: OleVariant;
 	ItemIndex, ItemName: OleVariant;
-	InputElement: IHTMLInputElement;
+	InputElement,InputElement1: IHTMLInputElement;
 	I, J: Integer;
 	InputName, InputValue: string;
 	FormCount: Integer;
-	FIFG:IHTMLElementCollection;
-	FIFF: IHTMLFormElement;
+	DatebaseOpt: TDatebaseOpt;
+	pws: TSQLIteTable;
 begin
 //FCP.Unadvise(FCookie);
 //if DEBUG_MODE then DebugInfo('Start Analysis  ' + IEURL);
 
 if (Copy(IEURL,1,4) = 'http') or (Copy(IEURL,1,5) = 'about') then
 begin
-	havepws := false;
+  havepws := false;
+	savepws := false;
 	HtmlDocument := FIE.Document as IHTMLDocument2;
 	HtmlForms := HtmlDocument.forms;
  if HtmlForms.Length = 0 then
@@ -253,24 +254,50 @@ begin
 	glpDisp := nil;
 	for FormCount := 0 to HtmlForms.length - 1 do
 	begin
-		HtmlForm := HtmlForms.item(FormCount, 0) as IHTMLFormElement;
-		for I := 0 to HtmlForm.Length - 1 do
+begin
+	HtmlForm := HtmlForms.item(FormCount, 0) as IHTMLFormElement;
+  for I := 0 to HtmlForm.Length - 1 do
+  begin
+    ItemIndex := 0;
+    ItemName := I;
+		if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
+			InputElement) then
 		begin
-			ItemIndex := 0;
-			ItemName := I;
-			if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
-				InputElement) then
-				if (InputElement.type_ = 'password') then
+      if(InputElement.type_ = 'password') then
+			begin
+				havepws := True;
+			try
+        DatebaseOpt := TDatebaseOpt.Create;
+        if DatebaseOpt.OpenDatebase('userpws.db','pwsinfo') then
+          pws := DatebaseOpt.SelectPws(HtmlDocument.url);
+        if pws.Count > 0 then
 				begin
-//					if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
-					InputName := InputElement.name;
-					havepws := true;
-					if application.MessageBox('是否要填入密码？','提示',MB_OKCANCEL) = 1 then
-							InputElement.Set_Value('admin');
-				end
-				else if (InputElement.type_='submit') then
-					(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
+					if application.MessageBox('是否要自动填入密码信息？','提示',MB_OKCANCEL) = 1 then
+					begin
+						savepws := True;
+						InputElement.Set_Value(pws.FieldAsString(pws.FieldIndex['UserPws']));
+						J := ItemName -1 ;
+						while J >= 0 do
+						begin
+							if Supports(HtmlForm.item(J, ItemIndex), IHTMLInputElement, InputElement1) then
+								if InputElement1.type_= 'text' then
+								begin
+									InputElement1.value := pws.FieldAsString(pws.FieldIndex['UserName']);
+                  break;
+								end;
+							J := J -1;
+						end;
+          end;
+				end;
+      finally
+				DatebaseOpt.CloseDatebase;
+			end;
+      end
+      else if (InputElement.type_='submit') then
+				(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
 		end;
+  end;
+end;
 	 end;
  end;
 end;
@@ -295,6 +322,7 @@ var
 	InputElement: IHTMLInputElement;
 	I, J: Integer;
 	InputName, InputValue: string;
+	DatebaseOpt: TDatebaseOpt;
 begin
 	HtmlDocument := FIE.Document as IHTMLDocument2;
 	HtmlForms := HtmlDocument.forms;
@@ -307,20 +335,21 @@ begin
 		ItemName := I;
 		if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
 			InputElement) then
-			if (InputElement.type_ = 'password') then
+		begin
+			if(InputElement.type_ = 'text') then
+        InputName :=InputElement.value;
+      if(InputElement.type_ = 'password') then
 			begin
-//				if DEBUG_MODE then DebugInfo('The Element is Password, the name is ' + InputElement.name);
-				if havepws then
-				begin
-					if application.MessageBox('是否要要保存密码？','提示',MB_OKCANCEL) = 1 then
-					begin
-						showmessage(trim(HtmlDocument.url));
-						showmessage(InputElement.name);
-						showmessage(InputElement.value);
-						showmessage('保存成功');
-					end;
+      	try
+					DatebaseOpt := TDatebaseOpt.Create;
+					if DatebaseOpt.OpenDatebase('userpws.db','pwsinfo') then
+						if application.MessageBox('是否要保存密码信息？','提示',MB_OKCANCEL) = 1 then
+							DatebaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value);
+				finally
+					DatebaseOpt.CloseDatebase;
 				end;
 			end;
+		end;
 	end;
 end;
 function TTIEAdvBHO.SetSite(const pUnkSite: IInterface): HResult;

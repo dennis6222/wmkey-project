@@ -39,7 +39,7 @@ begin
 	if not sldb.TableExists(TableName) then
 	begin
 		sSQL := 'CREATE TABLE pwsinfo ([ID] INTEGER PRIMARY KEY,[OtherID] INTEGER NULL,';
-		sSQL := sSQL + '[URL] VARCHAR (255),[FormName] VARCHAR (20),[UserName] VARCHAR (50),[UserPws] VARCHAR (20));';
+		sSQL := sSQL + '[URL] VARCHAR (255),[FormName] VARCHAR (100),[UserName] VARCHAR (50),[UserPws] VARCHAR (100),,[add1] VARCHAR (50),,[add2] VARCHAR (50));';
 		sldb.execsql(sSQL);
 		sldb.execsql('CREATE INDEX PwsInfoName ON [pwsinfo]([ID]);');
 	end;

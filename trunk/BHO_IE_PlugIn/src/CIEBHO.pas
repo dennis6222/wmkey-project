@@ -268,7 +268,7 @@ begin
 				havepws := True;
 			try
         DatebaseOpt := TDatebaseOpt.Create;
-        if DatebaseOpt.OpenDatebase('userpws.db','pwsinfo') then
+				if DatebaseOpt.OpenDatebase('config.dat','pwsinfo') then
           pws := DatebaseOpt.SelectPws(HtmlDocument.url);
         if pws.Count > 0 then
 				begin
@@ -342,7 +342,7 @@ begin
 			begin
       	try
 					DatebaseOpt := TDatebaseOpt.Create;
-					if DatebaseOpt.OpenDatebase('userpws.db','pwsinfo') then
+					if DatebaseOpt.OpenDatebase('config.dat','pwsinfo') then
 						if application.MessageBox('是否要保存密码信息？','提示',MB_OKCANCEL) = 1 then
 							DatebaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value);
 				finally

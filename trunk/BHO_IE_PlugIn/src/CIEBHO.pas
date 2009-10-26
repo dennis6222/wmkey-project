@@ -258,9 +258,11 @@ begin
   FocusState := SaveFocusState;
   //if Application.UseRightToLeftReading then Flags := Flags or MB_RTLREADING;
   try
-    formPin := TFormPin.Create(nil);
-    formPin.ParentWindow := TaskActiveWindow;
-    formPin.ShowModal;
+    //formPin := TFormPin.Create(nil);
+    //formPin.ParentWindow := TaskActiveWindow;
+
+    //formPin.ShowModal;
+    MessageBox(TaskActiveWindow,'demo','demo',mb_IconInformation+mb_OK);
   finally
     if MBMonitor <> AppMonitor then
       SetWindowPos(Application.Handle, 0,
@@ -271,7 +273,7 @@ begin
     SetActiveWindow(ActiveWindow);
     RestoreFocusState(FocusState);
 
-    formPin.Free;
+    //formPin.Free;
   end;
 
 end;

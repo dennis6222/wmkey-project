@@ -2,7 +2,7 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2009-10-22 17:26:30.906.pas,F:\mywork\Project\BHO_IE_PlugIn\src\DatebaseOpt.pas=F:\mywork\Project\BHO_IE_PlugIn\src\DatabaseOpt.pas</Transaction>
-    <Transaction>2009-10-26 14:14:03.187.pas,F:\mywork\Project\BHO_IE_PlugIn\src\Unit1.pas=F:\mywork\Project\BHO_IE_PlugIn\src\inputPIN.pas</Transaction>
-    <Transaction>2009-10-26 14:14:03.187.dfm,F:\mywork\Project\BHO_IE_PlugIn\src\Unit1.dfm=F:\mywork\Project\BHO_IE_PlugIn\src\inputPIN.dfm</Transaction>
+    <Transaction>2009-10-26 17:12:39.421.pas,D:\WM-Project\BHO_IE_PlugIn\src\Unit1.pas=D:\WM-Project\BHO_IE_PlugIn\src\UnitPin.pas</Transaction>
+    <Transaction>2009-10-26 17:12:39.421.dfm,D:\WM-Project\BHO_IE_PlugIn\src\Unit1.dfm=D:\WM-Project\BHO_IE_PlugIn\src\UnitPin.dfm</Transaction>
   </Transactions>
 </BorlandProject>

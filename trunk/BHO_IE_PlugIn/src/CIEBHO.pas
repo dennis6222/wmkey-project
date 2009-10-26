@@ -12,7 +12,7 @@ uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
-	ActnList, IniFiles, SQLiteTable3, DatabaseOpt, inputPIN;
+	ActnList, IniFiles, SQLiteTable3, DatabaseOpt;
 
 const
 	DEBUG_MODE = True;
@@ -29,8 +29,8 @@ type
 		HtmlDocument: IHTMLDocument2;
 		FDP:IHTMLDocument2;
 		IEURL: String;
-		havepws,savepws:Boolean;
-		InputPIN:TForm1;
+    havepws,savepws:Boolean;
+    procedure ShowTestDialog;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -64,7 +64,8 @@ var
 
 implementation
 
-uses ComServ, Sysutils, ComConst;
+uses UnitPin,
+     ComServ, Sysutils, ComConst;
 
 procedure DebugInfo(info:String);
 const
@@ -223,6 +224,28 @@ begin
 	end;
 end;
 
+procedure TTIEAdvBHO.ShowTestDialog;
+var
+  formPin : TFormPin;
+begin
+
+  formPin := TFormPin.Create(nil);
+  try
+    DebugInfo('ShowModal Start');
+    formPin.ShowModal;
+    DebugInfo('ShowModal finished');
+
+    if formPin.ModalResult = mrOK then 
+    begin
+      // add check
+    end;
+  finally
+    formPin.Free;
+    DebugInfo('ModalWindow Destroyed');
+  end;
+
+  
+end;
 procedure TTIEAdvBHO.ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
 var
 	Section: string;
@@ -273,15 +296,10 @@ begin
 					pws := DatabaseOpt.SelectPws(HtmlDocument.url);
         if pws.Count > 0 then
 				begin
-					if not Assigned(InputPIN) then
-					begin
-							InputPIN := TForm1.CreateParented(FIE.HWnd);
-							InputPIN.ShowModal;
-							if InputPIN.lag = 1  then
-								showmessage('确定按钮!');
-							InputPIN.Free;
-							InputPIN := nil;
-					End;
+
+
+          ShowTestDialog;
+          
 					if application.MessageBox('是否要自动填入密码信息？','提示',MB_OKCANCEL) = 1 then
 					begin
 						savepws := True;
@@ -384,7 +402,16 @@ begin
 		Exit;
 	if not Supports(FIE, IConnectionPointContainer, FCPC) then
 		Exit;
-
+//	FCPC.FindConnectionPoint( DWebBrowserEvents2, FCP);
+//	FCP.Advise(Self, FCookie);
+{	if not Supports(FIE,IHTMLDocument2,FDP) then
+		Exit;
+	if not Supports(FDP,IHTMLElementCollection,FIFG) then
+		Exit;
+	if not Supports(FIFG,IHTMLFormElement,FIFF) then
+		Exit;
+	if not Supports(FIFF,IConnectionPointContainer,FCPC) then
+		Exit;     }
  //	挂接事件
 	FCPC.FindConnectionPoint(DWebBrowserEvents2, FCP);
 	FCP.Advise(Self, FCookie);

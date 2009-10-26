@@ -7,7 +7,7 @@ uses
   DatabaseOpt in 'DatabaseOpt.pas',
   SQLite3 in 'SQLite3.pas',
   SQLiteTable3 in 'SQLiteTable3.pas',
-  inputPIN in 'inputPIN.pas' {Form1};
+  UnitPin in 'UnitPin.pas' {FormPin};
 
 exports
   DllGetClassObject,

@@ -2,7 +2,7 @@ object FormPin: TFormPin
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  Caption = 'Please input PIN '#35831#36755'PIN'#30721
+  Caption = 'Please input PIN '#35831#36755'PIN'#30721'  NEW Verdsion'
   ClientHeight = 177
   ClientWidth = 326
   Color = clBtnFace

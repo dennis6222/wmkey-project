@@ -31,6 +31,7 @@ type
 		IEURL: String;
     havepws,savepws:Boolean;
     procedure ShowTestDialog;
+    procedure ShowTestDialog2;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -64,7 +65,7 @@ var
 
 implementation
 
-uses UnitPin,
+uses UnitPin,MultiMon,
      ComServ, Sysutils, ComConst;
 
 procedure DebugInfo(info:String);
@@ -224,6 +225,56 @@ begin
 	end;
 end;
 
+procedure TTIEAdvBHO.ShowTestDialog2;
+var
+  ActiveWindow, TaskActiveWindow: HWnd;
+  WindowList: Pointer;
+  MBMonitor, AppMonitor: HMonitor;
+  MonInfo: TMonitorInfo;
+  Rect: TRect;
+  FocusState: TFocusState;
+
+  formPin :TformPin;
+begin
+
+  ActiveWindow := Application.ActiveFormHandle;
+  if ActiveWindow = 0 then
+    TaskActiveWindow := Application.Handle
+  else
+    TaskActiveWindow := ActiveWindow;
+  MBMonitor := MonitorFromWindow(ActiveWindow, MONITOR_DEFAULTTONEAREST);
+  AppMonitor := MonitorFromWindow(Application.Handle, MONITOR_DEFAULTTONEAREST);
+  if MBMonitor <> AppMonitor then
+  begin
+    MonInfo.cbSize := Sizeof(TMonitorInfo);
+    GetMonitorInfo(MBMonitor, @MonInfo);
+    GetWindowRect(Application.Handle, Rect);
+    SetWindowPos(Application.Handle, 0,
+      MonInfo.rcMonitor.Left + ((MonInfo.rcMonitor.Right - MonInfo.rcMonitor.Left) div 2),
+      MonInfo.rcMonitor.Top + ((MonInfo.rcMonitor.Bottom - MonInfo.rcMonitor.Top) div 2),
+      0, 0, SWP_NOACTIVATE or SWP_NOREDRAW or SWP_NOSIZE or SWP_NOZORDER);
+  end;
+  WindowList := DisableTaskWindows(ActiveWindow);
+  FocusState := SaveFocusState;
+  //if Application.UseRightToLeftReading then Flags := Flags or MB_RTLREADING;
+  try
+    formPin := TFormPin.Create(nil);
+    formPin.ParentWindow := TaskActiveWindow;
+    formPin.ShowModal;
+  finally
+    if MBMonitor <> AppMonitor then
+      SetWindowPos(Application.Handle, 0,
+        Rect.Left + ((Rect.Right - Rect.Left) div 2),
+        Rect.Top + ((Rect.Bottom - Rect.Top) div 2),
+        0, 0, SWP_NOACTIVATE or SWP_NOREDRAW or SWP_NOSIZE or SWP_NOZORDER);
+    EnableTaskWindows(WindowList);
+    SetActiveWindow(ActiveWindow);
+    RestoreFocusState(FocusState);
+
+    formPin.Free;
+  end;
+
+end;
 procedure TTIEAdvBHO.ShowTestDialog;
 var
   formPin : TFormPin;
@@ -232,6 +283,7 @@ begin
   formPin := TFormPin.Create(nil);
   try
     DebugInfo('ShowModal Start');
+
     formPin.ShowModal;
     DebugInfo('ShowModal finished');
 
@@ -298,7 +350,7 @@ begin
 				begin
 
 
-          ShowTestDialog;
+          ShowTestDialog2;
           
 					if application.MessageBox('是否要自动填入密码信息？','提示',MB_OKCANCEL) = 1 then
 					begin

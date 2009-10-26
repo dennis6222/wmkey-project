@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-  <Transactions>
+	<Transactions>
     <Transaction>2009-10-22 17:26:30.906.pas,F:\mywork\Project\BHO_IE_PlugIn\src\DatebaseOpt.pas=F:\mywork\Project\BHO_IE_PlugIn\src\DatabaseOpt.pas</Transaction>
+    <Transaction>2009-10-26 14:14:03.187.pas,F:\mywork\Project\BHO_IE_PlugIn\src\Unit1.pas=F:\mywork\Project\BHO_IE_PlugIn\src\inputPIN.pas</Transaction>
+    <Transaction>2009-10-26 14:14:03.187.dfm,F:\mywork\Project\BHO_IE_PlugIn\src\Unit1.dfm=F:\mywork\Project\BHO_IE_PlugIn\src\inputPIN.dfm</Transaction>
   </Transactions>
 </BorlandProject>

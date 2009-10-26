@@ -12,7 +12,7 @@ uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
-	ActnList, IniFiles, SQLiteTable3, DatabaseOpt;
+	ActnList, IniFiles, SQLiteTable3, DatabaseOpt, inputPIN;
 
 const
 	DEBUG_MODE = True;
@@ -29,7 +29,8 @@ type
 		HtmlDocument: IHTMLDocument2;
 		FDP:IHTMLDocument2;
 		IEURL: String;
-    havepws,savepws:Boolean;
+		havepws,savepws:Boolean;
+		InputPIN:TForm1;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -272,6 +273,15 @@ begin
 					pws := DatabaseOpt.SelectPws(HtmlDocument.url);
         if pws.Count > 0 then
 				begin
+					if not Assigned(InputPIN) then
+					begin
+							InputPIN := TForm1.CreateParented(FIE.HWnd);
+							InputPIN.ShowModal;
+							if InputPIN.lag = 1  then
+								showmessage('确定按钮!');
+							InputPIN.Free;
+							InputPIN := nil;
+					End;
 					if application.MessageBox('是否要自动填入密码信息？','提示',MB_OKCANCEL) = 1 then
 					begin
 						savepws := True;
@@ -374,16 +384,7 @@ begin
 		Exit;
 	if not Supports(FIE, IConnectionPointContainer, FCPC) then
 		Exit;
-//	FCPC.FindConnectionPoint( DWebBrowserEvents2, FCP);
-//	FCP.Advise(Self, FCookie);
-{	if not Supports(FIE,IHTMLDocument2,FDP) then
-		Exit;
-	if not Supports(FDP,IHTMLElementCollection,FIFG) then
-		Exit;
-	if not Supports(FIFG,IHTMLFormElement,FIFF) then
-		Exit;
-	if not Supports(FIFF,IConnectionPointContainer,FCPC) then
-		Exit;     }
+
  //	挂接事件
 	FCPC.FindConnectionPoint(DWebBrowserEvents2, FCP);
 	FCP.Advise(Self, FCookie);

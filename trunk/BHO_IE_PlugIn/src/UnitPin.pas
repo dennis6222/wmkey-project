@@ -86,6 +86,10 @@ begin
     WindowList := DisableTaskWindows(0);
     
     EnableWindow(ActiveWindow, False);
+
+    //由于 IE 7和IE6的线程方式可能不同，所以导致DisableTaskWindow得不到预期的效果(Disable掉主窗口）
+    //所以，人工Disable一下主窗口
+
     //WindowList := DisableTaskWindows(ActiveWindow);
     //GetWindowText(ActiveWindow,info, 255);
     //ShowMessage(info);

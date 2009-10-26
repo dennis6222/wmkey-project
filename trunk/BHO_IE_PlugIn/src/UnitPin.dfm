@@ -6,6 +6,7 @@ object FormPin: TFormPin
   ClientHeight = 177
   ClientWidth = 326
   Color = clBtnFace
+  DefaultMonitor = dmMainForm
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11

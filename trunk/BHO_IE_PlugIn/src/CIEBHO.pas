@@ -32,6 +32,7 @@ type
     havepws,savepws:Boolean;
     procedure ShowTestDialog;
     procedure ShowTestDialog2;
+    procedure ShowTestDialog3;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -225,6 +226,17 @@ begin
 	end;
 end;
 
+procedure TTIEAdvBho.ShowTestDialog3;
+var
+  formPin: TFormPin;
+begin
+
+  formPin := TFormPin.Create(nil);
+
+  formPin.ShowModal2;
+
+  formPin.Free;
+end;
 procedure TTIEAdvBHO.ShowTestDialog2;
 var
   ActiveWindow, TaskActiveWindow: HWnd;
@@ -258,11 +270,30 @@ begin
   FocusState := SaveFocusState;
   //if Application.UseRightToLeftReading then Flags := Flags or MB_RTLREADING;
   try
-    //formPin := TFormPin.Create(nil);
+    formPin := TFormPin.Create(nil);
     //formPin.ParentWindow := TaskActiveWindow;
+    //formPin.Parent := TaskActiveWindow;
 
     //formPin.ShowModal;
-    MessageBox(TaskActiveWindow,'demo','demo',mb_IconInformation+mb_OK);
+    //MessageBox(TaskActiveWindow,'demo','demo',mb_IconInformation+mb_OK);
+
+    formPin.Show;
+      try
+        SendMessage(formPin.Handle, CM_ACTIVATE, 0, 0);
+        formPin.ModalResult := 0;
+        repeat
+          Application.HandleMessage;
+          if Application.Terminated then formPin.ModalResult := mrCancel else
+            if formPin.ModalResult <> 0 then ;//formPin.CloseModal;
+        until formPin.ModalResult <> 0;
+        //Result := formPin.ModalResult;
+        SendMessage(formPin.Handle, CM_DEACTIVATE, 0, 0);
+        if GetActiveWindow <> formPin.Handle then ActiveWindow := 0;
+      finally
+        formPin.Hide;
+      end;
+
+
   finally
     if MBMonitor <> AppMonitor then
       SetWindowPos(Application.Handle, 0,
@@ -352,7 +383,7 @@ begin
 				begin
 
 
-          ShowTestDialog2;
+          ShowTestDialog3;
           
 					if application.MessageBox('是否要自动填入密码信息？','提示',MB_OKCANCEL) = 1 then
 					begin

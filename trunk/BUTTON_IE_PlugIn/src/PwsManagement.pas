@@ -75,7 +75,9 @@ var
 	qb: TQueryBuilder;
 	item,aItem: TQueryItem;
 begin
-
+  usern.Enabled := false;
+  userp.Enabled := false;
+  updaterow.Caption := '修改';
 //DataOpt := TDatabaseOpt.Create;
 //DataOpt.OpenDatabase('config.dat','pwsinfo');
 //res := DataOpt.SelectPws('http://mail.163.com/');
@@ -196,6 +198,11 @@ var
 index: Integer;
 ID: Integer;
 begin
+  if ListView1.Selected = nil then
+  begin
+    showmessage('您没有选择记录，请您选择');
+    exit;
+  end;
 	if ListView1.Selected <> nil then
 	begin
 		index := ListView1.Selected.Index;
@@ -217,13 +224,14 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
 	DataOpt := TDatabaseOpt.Create;
 	DataOpt.OpenDatabase('config.dat','pwsinfo');
-  updaterow.Enabled := false;   //更新删除按钮使能
-	deleterow.Enabled := false;
 
 	nextpage.Enabled := false;   //页数按钮使能
 	tailpage.Enabled := false;
 	headpage.Enabled := False;
 	uppage.Enabled := False;
+	sqlstr := 'select * from pwsinfo';
+	page := 1;
+	checkuser(sqlstr,page);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -252,8 +260,10 @@ begin
   userp.Text := listview1.Items[index].SubItems.strings[3]; //读第i行第5列
 //  beizhu1.Text := listview1.Items[index].SubItems.strings[4]; //读第i行第6列
 //  beizhu2.Text := listview1.Items[index].SubItems.strings[5]; //读第i行第7列
-  updaterow.Enabled := true;
-  deleterow.Enabled := true;
+
+  usern.Enabled := false;
+  userp.Enabled := false;
+  updaterow.Caption := '修改';
 end;
 end;
 
@@ -270,12 +280,37 @@ checkuser(sqlstr,page);
 end;
 
 procedure TForm1.updaterowClick(Sender: TObject);
+var
+  ID,index: Integer;
+  username,userpws: String;
 begin
-usern.Enabled := true;
-userp.Enabled := true;
-usern.SelectAll;
-usern.SetFocus;
-updaterow.Caption := '提交';
+if ListView1.Selected = nil then
+begin
+  showmessage('您没有选择记录，请您选择.');
+  exit;
+end;
+if updaterow.Caption = '修改' then
+begin
+  updaterow.Caption := '提交';
+  usern.Enabled := true;
+  userp.Enabled := true;
+  usern.SelectAll;
+  usern.SetFocus;
+end
+else
+begin
+  updaterow.Caption := '修改';
+  index := ListView1.Selected.Index;
+  ID := strtoint(listview1.Items[index].Caption); //读第i行第1列
+	username := usern.Text;
+  userpws := userp.Text;
+  DataOpt.Upate(ID,username,userpws);
+	checkuser(sqlstr,page);
+  showmessage('修改成功！');
+  usern.Enabled := false;
+  userp.Enabled := false;
+end;
+
 end;
 
 procedure TForm1.uppageClick(Sender: TObject);

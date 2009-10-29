@@ -19,6 +19,7 @@ type TDatabaseOpt = Class
 		function Select(SQL:String):TSQLIteTable;
 		function InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
 		function DeleteForId(ID: Integer):Boolean;
+    function Upate(ID: Integer;username,userpws:String):Boolean;
 
 End;
 implementation
@@ -90,6 +91,15 @@ begin
 	sldb.ExecSQL(sSQL);
 	sldb.Commit;
 	result := true;
+end;
+function TDatabaseOpt.Upate(ID: Integer; username: string; userpws: string):Boolean;
+begin
+  result := false;
+  sldb.BeginTransaction;
+  sSQL := 'update pwsinfo set UserName ='''+ username +''',UserPws = '''+ userpws + '''Where ID = ' + inttostr(ID);
+	sldb.ExecSQL(sSQL);
+  sldb.Commit;
+  result := true;
 end;
 procedure TDatabaseOpt.CloseDatabase;
 begin

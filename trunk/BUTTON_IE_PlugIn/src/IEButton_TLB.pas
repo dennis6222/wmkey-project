@@ -12,10 +12,10 @@ unit IEButton_TLB;
 // ************************************************************************ //
 
 // $Rev: 8291 $
-// File generated on 2009-10-28 10:13:26 from Type Library described below.
+// File generated on 2009-10-29 9:40:06 from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: F:\IE Button\src\IEButton.tlb (1)
+// Type Lib: F:\mywork\Project\BUTTON_IE_PlugIn\src\IEButton.tlb (1)
 // LIBID: {12A31D8E-369B-4C4C-ACBB-836FF4128E90}
 // LCID: 0
 // Helpfile: 

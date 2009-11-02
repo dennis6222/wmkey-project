@@ -17,10 +17,10 @@ type TDatabaseOpt = Class
 		procedure CloseDatabase;
 		function SelectPws(URL:String):TSQLIteTable;
 		function Select(SQL:String):TSQLIteTable;
-		function InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
+		function InsertList(URL:String;FormName:String;UserName:String;UserPws:String;TypeStr:String):Boolean;
 		function DeleteForId(ID: Integer):Boolean;
     function Upate(ID: Integer;username,userpws:String):Boolean;
-    function UpatePws(URL: String;userpws:String):Boolean;
+		function UpatePws(URL: String;userpws:String):Boolean;
     procedure Insert();
 
 End;
@@ -93,12 +93,12 @@ begin
 	result := sltb;
 end;
 
-function TDatabaseOpt.InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
+function TDatabaseOpt.InsertList(URL:String;FormName:String;UserName:String;UserPws:String;TypeStr:String):Boolean;
 begin
 //   showmessage(url+'||'+FormName +'||'+ UserName +'||'+ UserPws);
 	sldb.BeginTransaction;
 
-	sSQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws) VALUES ("'+URL+'","'+FormName+'","'+UserName+'","'+UserPws+'");';
+	sSQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type) VALUES ("'+URL+'","'+FormName+'","'+UserName+'","'+UserPws+'","'+TypeStr+'");';
 
 	//do the insert
 	sldb.ExecSQL(sSQL);

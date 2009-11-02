@@ -12,7 +12,7 @@ uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
-	ActnList, IniFiles, SQLiteTable3, DatabaseOpt, UnitPin;
+	ActnList, IniFiles, SQLiteTable3, DatabaseOpt, UnitPin, UnitSureSave;
 
 const
 	DEBUG_MODE = True;
@@ -31,6 +31,7 @@ type
 		IEURL: String;
 		havepws,savepws:Boolean;
 		formPin: TFormPin;
+		formSureSave: TSureSave;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -345,14 +346,18 @@ begin
         InputName :=InputElement.value;
       if(InputElement.type_ = 'password') then
 			begin
-      	try
+				try
+					formSureSave := TSureSave.Create(nil);
 					DatabaseOpt := TDatabaseOpt.Create;
+					formSureSave.ShowModal2;
 					if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
-						if application.MessageBox('是否要保存密码信息？','提示',MB_OKCANCEL) = 1 then
-							DatabaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value);
+						if 	formSureSave.savetype <> '' then
+		 					DatabaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value,formSureSave.savetype);
 				finally
 					DatabaseOpt.CloseDatabase;
+					formSureSave.Free;					
 				end;
+
 			end;
 		end;
 	end;

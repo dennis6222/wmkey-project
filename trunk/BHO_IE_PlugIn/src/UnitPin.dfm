@@ -1112,7 +1112,7 @@ object FormPin: TFormPin
     end
     object Button1: TButton
       Left = 248
-      Top = 264
+      Top = 265
       Width = 75
       Height = 25
       Caption = #30830#23450

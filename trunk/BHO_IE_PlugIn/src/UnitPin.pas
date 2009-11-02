@@ -20,8 +20,6 @@ type
     Button2: TButton;
     Image3: TImage;
     procedure FormShow(Sender: TObject);
-    procedure ButtonOKClick(Sender: TObject);
-    procedure ButtonChanelClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
 	private
@@ -66,38 +64,10 @@ begin
 	Close;
 end;
 
-procedure TFormPin.ButtonChanelClick(Sender: TObject);
-begin
-close;
-end;
-
-procedure TFormPin.ButtonOKClick(Sender: TObject);
-begin
-
-	// this is just a test
-	// demostration how to check a valid pin and goes into next process.
-
-	if Edit1.Text = '1234567' then
-	begin
-//		formPin.Hide;
-//    FormPin.Hide;
-		ModalResult := mrOK
-	end
-	else
-	begin
-		MessageBox(Handle,'Please Input valid PIN code!', 'ÌבÊ¾',mb_IconInformation+ mb_OK);
-		Edit1.SelectAll;
-		Edit1.SetFocus;
-		Exit;
-	end;
-end;
-
 procedure TFormPin.FormShow(Sender: TObject);
 begin
   Edit1.SetFocus;
 end;
-
-
 
 function TFormPin.ShowModal2:Integer;
 var

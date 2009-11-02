@@ -20,9 +20,33 @@ type TDatabaseOpt = Class
 		function InsertList(URL:String;FormName:String;UserName:String;UserPws:String):Boolean;
 		function DeleteForId(ID: Integer):Boolean;
     function Upate(ID: Integer;username,userpws:String):Boolean;
+    function UpatePws(URL: String;userpws:String):Boolean;
+    procedure Insert();
 
 End;
 implementation
+
+procedure TDatabaseOpt.Insert;
+begin
+  sldb.BeginTransaction;
+
+  sSQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type) VALUES ("http://www.xiaonei.com","Form1","wang1","19861019","娱乐");';
+  //do the insert
+  sldb.ExecSQL(sSQL);
+
+  sSQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type) VALUES ("http://www.xiaonei.com","Form2","wang2","19861019","娱乐");';
+  //do the insert
+  sldb.ExecSQL(sSQL);
+
+  sSQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type) VALUES ("http://www.21cn.com","Form1","wang1","19861019","军事");';
+  //do the insert
+  sldb.ExecSQL(sSQL);
+  sSQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type) VALUES ("http://www.21cn.com","Form2","wang2","19861019","军事");';
+  //do the insert
+  sldb.ExecSQL(sSQL);
+  //end the transaction
+  sldb.Commit;
+end;
 
 function TDatabaseOpt.OpenDatabase(DatebaseName:String;TableName:String):Boolean;
 var
@@ -42,7 +66,7 @@ begin
 	if not sldb.TableExists(TableName) then
 	begin
 		sSQL := 'CREATE TABLE pwsinfo ([ID] INTEGER PRIMARY KEY,';
-		sSQL := sSQL + '[URL] VARCHAR (255),[FormName] VARCHAR (100),[UserName] VARCHAR (50),[UserPws] VARCHAR (100),,[add1] VARCHAR (50),,[add2] VARCHAR (50));';
+		sSQL := sSQL + '[URL] VARCHAR (255),[FormName] VARCHAR (100),[UserName] VARCHAR (50),[UserPws] VARCHAR (100),[Type] VARCHAR (100),[add1] VARCHAR (50),[add2] VARCHAR (50));';
 		sldb.execsql(sSQL);
 		sldb.execsql('CREATE INDEX PwsInfoName ON [pwsinfo]([ID]);');
 	end;
@@ -54,7 +78,7 @@ var
 	selectString: String;
 	count: Integer;
 begin
-//	selectString := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + URL+'''';
+	selectString := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + URL+'''';
 //	selectString := 'SELECT * FROM pwsinfo ';
 	if URL <> '' then
 		sltb := slDb.GetTable(selectString);
@@ -97,6 +121,15 @@ begin
   result := false;
   sldb.BeginTransaction;
   sSQL := 'update pwsinfo set UserName ='''+ username +''',UserPws = '''+ userpws + '''Where ID = ' + inttostr(ID);
+	sldb.ExecSQL(sSQL);
+  sldb.Commit;
+  result := true;
+end;
+function TDatabaseOpt.UpatePws(URL: string; userpws: string):Boolean;
+begin
+  result := false;
+  sldb.BeginTransaction;
+  sSQL := 'update pwsinfo set UserPws = '''+ userpws + '''Where Url = ''' + URL + '''';
 	sldb.ExecSQL(sSQL);
   sldb.Commit;
   result := true;

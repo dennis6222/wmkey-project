@@ -9,7 +9,8 @@ uses
   PwsManagement in 'PwsManagement.pas' {Form1},
   DatabaseOpt in 'DatabaseOpt.pas',
   UnitPin in 'UnitPin.pas',
-  QueryUnit in 'QueryUnit.pas';
+  QueryUnit in 'QueryUnit.pas',
+  UpdatePws in 'UpdatePws.pas' {Form2};
 
 exports
   DllGetClassObject,

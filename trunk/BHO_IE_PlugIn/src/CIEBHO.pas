@@ -272,7 +272,8 @@ begin
 					pws := DatabaseOpt.SelectPws(HtmlDocument.url);
         if pws.Count > 0 then
 				begin
-
+					if Application.MessageBox('您是否要自动填入密码？','提示',MB_OKCANCEL) <> 1 then
+          	exit;
 					formPin := TFormPin.Create(nil);         //Create input PIN form
 
 					if formPin.ShowModal2 = 1 then

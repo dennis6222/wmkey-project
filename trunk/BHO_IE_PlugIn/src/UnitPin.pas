@@ -4,16 +4,27 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
-
+//	Dialogs, StdCtrls, PwsManagement, VrControls, VrButtons,  ExtCtrls;
+	Dialogs, StdCtrls,  ExtCtrls, jpeg;
 type
   TFormPin = class(TForm)
-    btnOK: TButton;
-    Edit1: TEdit;
+    Panel1: TPanel;
+    Image2: TImage;
+    Image1: TImage;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
     Label1: TLabel;
-    procedure btnOKClick(Sender: TObject);
+    Edit1: TEdit;
+    Button1: TButton;
+    Button2: TButton;
+    Image3: TImage;
     procedure FormShow(Sender: TObject);
-  private
+    procedure ButtonOKClick(Sender: TObject);
+    procedure ButtonChanelClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+	private
     { Private declarations }
   public
     { Public declarations }
@@ -21,28 +32,64 @@ type
   end;
 
 var
-  FormPin: TFormPin;
-
+	FormPin: TFormPin;
 implementation
 
 uses
-  Consts;
+	Consts;
 {$R *.dfm}
 
-procedure TFormPin.btnOKClick(Sender: TObject);
+procedure TFormPin.Button1Click(Sender: TObject);
+begin
+	// this is just a test
+	// demostration how to check a valid pin and goes into next process.
+
+	if Edit1.Text = '1234567' then
+	begin
+//		formPin.Hide;
+//		pwsform :=TForm1.Create(nil);
+//		pwsform.ShowModal;
+//    FormPin.Hide;
+		ModalResult := mrOK
+	end
+	else
+	begin
+		MessageBox(Handle,'Please Input valid PIN code!', '提示',mb_IconInformation+ mb_OK);
+		Edit1.SelectAll;
+		Edit1.SetFocus;
+		Exit;
+	end;
+end;
+
+procedure TFormPin.Button2Click(Sender: TObject);
+begin
+	Close;
+end;
+
+procedure TFormPin.ButtonChanelClick(Sender: TObject);
+begin
+close;
+end;
+
+procedure TFormPin.ButtonOKClick(Sender: TObject);
 begin
 
-  // this is just a test
-  // demostration how to check a valid pin and goes into next process.
+	// this is just a test
+	// demostration how to check a valid pin and goes into next process.
 
-  if Edit1.Text = '1234567' then ModalResult := mrOK
-  else
-  begin
-    MessageBox(Handle,'Please Input valid PIN code!', '提示',mb_IconInformation+ mb_OK);
-    Edit1.SelectAll;
-    Edit1.SetFocus;
-    Exit;
-  end;
+	if Edit1.Text = '1234567' then
+	begin
+//		formPin.Hide;
+//    FormPin.Hide;
+		ModalResult := mrOK
+	end
+	else
+	begin
+		MessageBox(Handle,'Please Input valid PIN code!', '提示',mb_IconInformation+ mb_OK);
+		Edit1.SelectAll;
+		Edit1.SetFocus;
+		Exit;
+	end;
 end;
 
 procedure TFormPin.FormShow(Sender: TObject);

@@ -6,7 +6,7 @@ unit CIEButton ;
 interface
 
 uses
-	Windows, ActiveX, Classes, ComObj,OleCtrls, ShlObj, ShdocVw, SysUtils, UnitPin;
+	Windows, ActiveX, Classes, ComObj,OleCtrls, ShlObj, ShdocVw, SysUtils, UnitPin, PwsManagement;
 
 type
   TIEHomeButton = class(TComObject, IOleCommandTarget, IObjectWithSite)
@@ -43,15 +43,22 @@ function TIEHomeButton.Exec(CmdGroup: PGUID; nCmdID, nCmdexecopt: DWORD;
   const vaIn: OleVariant; var vaOut: OleVariant): HResult;
 var
 	formPin:TFormPin;
+	pwsform: TForm1;
 begin
   Result := S_OK;
   //nCmdID为0时，表示菜单和工具条按钮被点击了
 //  IE.Navigate('http://hubdog.csdn.net', emptyParam,emptyParam,emptyParam,emptyParam);
-	if Assigned(formPin) then
-	begin
+//	if Assigned(formPin) then
+//	begin
 		formPin := TFormPin.Create(nil);
-    formPin.ShowModal2;
-	end;
+		formPin.ShowModal2;
+    if formPin.ModalResult = 1 then
+    begin
+   		pwsform :=TForm1.Create(nil);
+  		pwsform.ShowModal;
+		end;
+		formPin.Free;
+//	end;
 
 end;
 

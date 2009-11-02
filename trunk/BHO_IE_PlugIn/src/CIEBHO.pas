@@ -334,6 +334,8 @@ begin
 	HtmlForms := HtmlDocument.forms;
 	if HtmlForms.Length = 0 then
 		Exit;
+	if savepws then
+  	Exit;
 	HtmlForm := HtmlForms.item(0, 0) as IHTMLFormElement;
 	for I := 0 to HtmlForm.Length - 1 do
 	begin

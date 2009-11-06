@@ -24,10 +24,9 @@ type
 		FIE: IWebBrowser2;
 		FCPC: IConnectionPointContainer;
 		FCP: IConnectionPoint;
-		FCookie,FCookie1: Integer;
+		FCookie: Integer;
 
 		HtmlDocument: IHTMLDocument2;
-		FDP:IHTMLDocument2;
 		IEURL: String;
 		havepws,savepws:Boolean;
 		formPin: TFormPin;
@@ -52,17 +51,21 @@ type
 															var Headers: OleVariant; var Cancel: WordBool);
 
 
-    procedure ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
+//		procedure ProgressChange(Progress: Integer; ProgressMax: Integer);
+//		procedure ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
+		procedure ProgressChange;
 		procedure NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);
 //		procedure SubmitSave(var URL: OleVariant);
-		procedure SubmitSave;
+		procedure FormEvent;      //表单事件
 	end;
 
 const
 	Class_TIEAdvBHO: TGUID = '{D032570A-5F63-4812-A094-87D007C23012}';
 var
 	glpDisp: IDispatch = nil;
-
+	HtmlForms: IHTMLElementCollection;
+	HtmlForm: IHTMLFormElement;
+	HtmlDocument: IHTMLDocument2;
 implementation
 
 uses MultiMon,
@@ -99,7 +102,7 @@ procedure TTIEAdvBHO.DoBeforeNavigate2(const pDisp: IDispatch; var URL,
 	var Cancel: WordBool);
 
 begin
-	IEURL := URL;
+//	IEURL := URL;
 end;
 
 procedure TTIEAdvBHO.DoNewWindow2(var ppDisp: IDispatch;
@@ -156,7 +159,6 @@ begin
 	for i := 0 to dps.cNamedArgs - 1 do
 		pDispIds^[dps.rgdispidNamedArgs^[i]] := i;
 end;
-
 function TTIEAdvBHO.Invoke(DispID: Integer; const IID: TGUID;
 	LocaleID: Integer; Flags: Word; var Params; VarResult, ExcepInfo,
 	ArgErr: Pointer): HResult;
@@ -167,7 +169,7 @@ var
 	iDispIdsSize: integer;
 begin
 
-  pDispIds := nil;
+	pDispIds := nil;
   iDispIdsSize := 0;
 	bHasParams := (dps.cArgs > 0);
 
@@ -180,6 +182,7 @@ begin
 		if (bHasParams) then
 			BuildPositionalDispIds(pDispIds, dps);
 		Result := S_OK;
+
 		case DispId of
 //      251://NEWWINDOW2事件ID
 //        begin
@@ -192,29 +195,31 @@ begin
 					DoBeforeNavigate2(IDispatch(dps.rgvarg^[pDispIds^[0]].dispval),
 							POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^,
 							POleVariant(dps.rgvarg^[pDispIds^[2]].pvarval)^,
-              POleVariant(dps.rgvarg^[pDispIds^[3]].pvarval)^,
-              POleVariant(dps.rgvarg^[pDispIds^[4]].pvarval)^,
+							POleVariant(dps.rgvarg^[pDispIds^[3]].pvarval)^,
+							POleVariant(dps.rgvarg^[pDispIds^[4]].pvarval)^,
 							POleVariant(dps.rgvarg^[pDispIds^[5]].pvarval)^,
 							dps.rgvarg^[pDispIds^[6]].pbool^);
 				end;
 			252:
 				begin
 					NavigateComplete2(IDispatch(dps.rgvarg^[pDispIds^[0]].dispval),
-              POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^);
+							POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^);
 				end;
 			253://OnQuit事件ID
 				begin
 					FCP.Unadvise(FCookie);
 				end;
-			259:      //页面加载完成,判断是否有PWS输入框，并填写信息
+			108:
 				begin
-          ActionLoadExecute(IDispatch(dps.rgvarg^[pDispIds^[0]].dispval),
-              POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^);
+				 if dps.rgvarg^[1].lVal = -1 then     //页面加载进度完成
+				 begin
+						ProgressChange;
+				 end;
 				end;
 				0:              //页面提交事件，保存密码信息。
 				begin
-			//		SubmitSave(POleVariant(dps.rgvarg^[pDispIds^[1]].pvarval)^);
-				SubmitSave;
+			 //	SubmitSave;
+			 		FormEvent
 				end;
 		else
 			Result := DISP_E_MEMBERNOTFOUND;
@@ -225,23 +230,14 @@ begin
 	end;
 end;
 
-procedure TTIEAdvBHO.ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
+//procedure TTIEAdvBHO.ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
+procedure TTIEAdvBHO.ProgressChange;    //进度加载完毕，注册事件
 var
-	Section: string;
-	HtmlDocument: IHTMLDocument2;
-	HtmlForms: IHTMLElementCollection;
-	HtmlForm: IHTMLFormElement;
-	FormName: WideString;
-	Name, Index: OleVariant;
 	ItemIndex, ItemName: OleVariant;
-	InputElement,InputElement1: IHTMLInputElement;
-	I, J: Integer;
-	InputName, InputValue: string;
+	InputElement: IHTMLInputElement;
+	I: Integer;
 	FormCount: Integer;
-	DatabaseOpt: TDatabaseOpt;
-	pws: TSQLIteTable;
 begin
-
 if (Copy(IEURL,1,4) = 'http') or (Copy(IEURL,1,5) = 'about') then
 begin
   havepws := false;
@@ -250,36 +246,75 @@ begin
 	HtmlForms := HtmlDocument.forms;
  if HtmlForms.Length = 0 then
 		Exit;
- if (glpDisp <> nil) and (glpDisp = pDisp) then
- begin
-	glpDisp := nil;
+
 	for FormCount := 0 to HtmlForms.length - 1 do
 	begin
-begin
 	HtmlForm := HtmlForms.item(FormCount, 0) as IHTMLFormElement;
-  for I := 0 to HtmlForm.Length - 1 do
-  begin
-    ItemIndex := 0;
-    ItemName := I;
+
+	for I := 0 to HtmlForm.Length - 1 do
+	begin
+		ItemIndex := 0;
+		ItemName := I;
 		if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
 			InputElement) then
 		begin
-			if(InputElement.type_ = 'password') then   
+			if(InputElement.type_ = 'password') then
 			begin
 				havepws := True;
+				(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
+			end
+			else if (InputElement.type_='submit') then
+				(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
+		end;
+	end;
+end;
+end;
+end;
+procedure TTIEAdvBHO.FormEvent;         //表单事件处理函数
+var
+	ItemIndex, ItemName: OleVariant;
+	InputElement,InputElement1: IHTMLInputElement;
+	I, J: Integer;
+	InputName, InputValue: string;
+	FormCount: Integer;
+	DatabaseOpt: TDatabaseOpt;
+	pws: TSQLIteTable;
+begin
+	for FormCount := 0 to HtmlForms.length - 1 do
+	begin
+	HtmlForm := HtmlForms.item(FormCount, 0) as IHTMLFormElement;
+
+	for I := 0 to HtmlForm.Length - 1 do
+	begin
+		ItemIndex := 0;
+		ItemName := I;
+		if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
+			InputElement) then
+		begin
+			if(InputElement.type_ = 'password') then
+			begin
+				havepws := True;
+ 
 			try
 				DatabaseOpt := TDatabaseOpt.Create;
 				if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
 					pws := DatabaseOpt.SelectPws(HtmlDocument.url);
-        if pws.Count > 0 then
+				savepws := false;
+				if pws.Count > 0 then
 				begin
+					savepws := True;
+				end;
+				if (InputElement.value = '') and savepws then       //获得焦点事件自动填入数据
+				begin
+          
 					if Application.MessageBox('您是否要自动填入密码？','提示',MB_OKCANCEL) <> 1 then
-          	exit;
+					begin
+						exit;
+					end;
 					formPin := TFormPin.Create(nil);         //Create input PIN form
 
 					if formPin.ShowModal2 = 1 then
 					begin
-						savepws := True;
 						InputElement.Set_Value(pws.FieldAsString(pws.FieldIndex['UserPws']));
 						J := ItemName -1 ;
 						while J >= 0 do
@@ -295,89 +330,46 @@ begin
 					end;
 					formPin.Free;
 				end;
-			finally
-				DatabaseOpt.CloseDatabase;
-			end;
-      end
-      else if (InputElement.type_='submit') then
-				(InputElement as IHtmlElement).OnClick:=OleVariant(Self as IDispatch);
-		end;
-  end;
-end;
-	 end;
- end;
-end;
-end;
-
-procedure TTIEAdvBHO.NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);
-begin
-	 if   glpDisp = nil then
-		glpDisp := pDisp;
-
-end;
-//procedure TTIEAdvBHO.SubmitSave(var URL: OleVariant);
-procedure TTIEAdvBHO.SubmitSave;
-var
-	Section: string;
-	HtmlDocument: IHTMLDocument2;
-	HtmlForms: IHTMLElementCollection;
-	HtmlForm: IHTMLFormElement;
-	FormName: WideString;
-	Name, Index: OleVariant;
-	ItemIndex, ItemName: OleVariant;
-	InputElement: IHTMLInputElement;
-	I, J: Integer;
-	InputName, InputValue: string;
-	DatabaseOpt: TDatabaseOpt;
-begin
-	HtmlDocument := FIE.Document as IHTMLDocument2;
-	HtmlForms := HtmlDocument.forms;
-	if HtmlForms.Length = 0 then
-		Exit;
-	if savepws then
-  	Exit;
-	HtmlForm := HtmlForms.item(0, 0) as IHTMLFormElement;
-	for I := 0 to HtmlForm.Length - 1 do
-	begin
-		ItemIndex := 0;
-		ItemName := I;
-		if Supports(HtmlForm.item(ItemName, ItemIndex), IHTMLInputElement,
-			InputElement) then
-		begin
-			if(InputElement.type_ = 'text') then
-        InputName :=InputElement.value;
-      if(InputElement.type_ = 'password') then
-			begin
-				try
+				if (InputElement.value <> '') and (not savepws) then    //提交事件，自动保存数据
+				begin
+					inputValue := InputElement.value;
+						J := ItemName -1 ;
+						while J >= 0 do
+						begin
+							if Supports(HtmlForm.item(J, ItemIndex), IHTMLInputElement, InputElement1) then
+								if InputElement1.type_= 'text' then
+								begin
+									InputName := InputElement1.value;
+									break;
+								end;
+							J := J -1;
+						end;
 					formSureSave := TSureSave.Create(nil);
 					DatabaseOpt := TDatabaseOpt.Create;
 					formSureSave.ShowModal2;
 					if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
 						if 	formSureSave.savetype <> '' then
-		 					DatabaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value,formSureSave.savetype);
-				finally
-					DatabaseOpt.CloseDatabase;
-					formSureSave.Free;					
+							DatabaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value,formSureSave.savetype);
 				end;
-
+			finally
+				DatabaseOpt.CloseDatabase;
+			end;
 			end;
 		end;
 	end;
+	end;
+end;
+
+procedure TTIEAdvBHO.NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);
+begin
+	 if   glpDisp = nil then
+	 begin
+		glpDisp := pDisp;
+	 IEURL := URL;
+	 end;
+
 end;
 function TTIEAdvBHO.SetSite(const pUnkSite: IInterface): HResult;
-var
-	Section: string;
-
-	HtmlForms: IHTMLElementCollection;
-	HtmlForm: IHTMLFormElement;
-	FormName: WideString;
-	Name, Index: OleVariant;
-	ItemIndex, ItemName: OleVariant;
-	InputElement: IHTMLInputElement;
-	I, J: Integer;
-	InputName, InputValue: string;
-	FIFG:IHTMLElementCollection;
-	FIFF: IHTMLFormElement;
 begin
 	Result := E_FAIL;
 	//保存接口
@@ -386,7 +378,7 @@ begin
 		Exit;
 	if not Supports(FIE, IConnectionPointContainer, FCPC) then
 		Exit;
-		
+
  //	挂接事件
 	FCPC.FindConnectionPoint(DWebBrowserEvents2, FCP);
 	FCP.Advise(Self, FCookie);

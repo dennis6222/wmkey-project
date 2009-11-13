@@ -27,8 +27,6 @@ object Form2: TForm2
     Color = clBtnHighlight
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 441
-    ExplicitHeight = 279
     object Image1: TImage
       Left = 1
       Top = 0

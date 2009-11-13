@@ -8,7 +8,9 @@ uses
   SQLite3 in 'SQLite3.pas',
   SQLiteTable3 in 'SQLiteTable3.pas',
   UnitPin in 'UnitPin.pas' {FormPin},
-  UnitSureSave in 'UnitSureSave.pas' {SureSave};
+  UnitSureSave in 'UnitSureSave.pas' {SureSave},
+  UnitAutoFillChoose in 'UnitAutoFillChoose.pas' {AutoFill},
+  UnitMultiUserChoose in 'UnitMultiUserChoose.pas' {MultiUserChoose};
 
 exports
   DllGetClassObject,

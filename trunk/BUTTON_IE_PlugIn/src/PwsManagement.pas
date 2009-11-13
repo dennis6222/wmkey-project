@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 	Dialogs, SQLite3, DatabaseOpt, StdCtrls, Grids, DBGrids,SQLIteTable3, DB,
-	ComCtrls, Buttons, ExtCtrls, QueryUnit, Menus, jpeg, ToolWin, ImgList;
+	ComCtrls, Buttons, ExtCtrls, QueryUnit, Menus, jpeg, ToolWin, ImgList, UnitUserParaManage;
 
 type
 	TForm1 = class(TForm)
@@ -29,6 +29,8 @@ type
     Editschurl: TEdit;
     N11: TMenuItem;
     N6: TMenuItem;
+    N12: TMenuItem;
+    N13: TMenuItem;
 		procedure checkuser(Sqlstr: String);
     procedure ListView1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -45,6 +47,7 @@ type
     procedure N7Click(Sender: TObject);
     procedure N9Click(Sender: TObject);
     procedure N4Click(Sender: TObject);
+    procedure N13Click(Sender: TObject);
   private
 		{ Private declarations }
   public
@@ -68,6 +71,7 @@ procedure TForm1.delrow;
 var
 index: Integer;
 ID: Integer;
+SQL: String;
 begin
   if ListView1.Selected = nil then
   begin
@@ -80,7 +84,8 @@ begin
 		ID := strtoint(listview1.Items[index].Caption); //读第i行第1列
 		if Application.MessageBox('您是否确定要删除此数据？','提示',MB_OKCANCEL) = 1 then
 		begin
-			DataOpt.DeleteForId(ID);
+			SQL := 'delete from pwsinfo where ID = ' + inttostr(ID);
+			DataOpt.Delete(SQL);
 			checkuser(sqlstr);
 		end;
 	end;
@@ -92,7 +97,8 @@ var
 	formPin:TFormPin;
   Index: Integer;
   URL: String;
-  showpws: String;
+	showpws: String;
+	SQL:String;
 begin
   if ListView1.Selected = nil then
   begin
@@ -108,9 +114,10 @@ begin
     	if ListView1.Selected <> nil then
     	begin
     		index := ListView1.Selected.Index;
-    		URL := listview1.Items[index].SubItems.strings[0]; //读第i行第1列
-  			res := DataOpt.SelectPws(URL);
-        if res.Count >0 then
+				URL := listview1.Items[index].SubItems.strings[0]; //读第i行第1列
+				SQL := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + URL+'''';
+				res := DataOpt.Select(SQL);
+				if res.Count >0 then
         begin
           showpws := res.FieldAsString(res.FieldIndex['UserPws']);
           showmessage('user password: ' + showpws);
@@ -123,17 +130,17 @@ end;
 procedure TForm1.updatepws;
 var
   updatep: TForm2;
-  index: Integer;
+	index: Integer;
 begin
-  if ListView1.Selected = nil then
+	if ListView1.Selected = nil then
   begin
     showmessage('您没有选择记录，请您选择');
     exit;
   end;
   index := ListView1.Selected.Index;
-  updatep := TForm2.Create(nil);
+	updatep := TForm2.Create(nil);
   updatep.URL := listview1.Items[index].SubItems.strings[0]; //读第i行第1列;
-  updatep.ShowModal;
+	updatep.ShowModal;
 	checkuser(sqlstr);
 end;
 procedure TForm1.checkuser(Sqlstr: String);
@@ -264,9 +271,18 @@ begin
   showpws;
 end;
 
+procedure TForm1.N13Click(Sender: TObject);
+var
+	ParaManage: TParaManage;
+begin
+	ParaManage := TParaManage.Create(nil);
+	ParaManage.ShowModal;
+	checkuser(sqlstr);
+end;
+
 procedure TForm1.N4Click(Sender: TObject);
 begin
-  updatepws;
+	updatepws;
 end;
 
 procedure TForm1.N5Click(Sender: TObject);

@@ -10,7 +10,8 @@ uses
   DatabaseOpt in 'DatabaseOpt.pas',
   UnitPin in 'UnitPin.pas',
   QueryUnit in 'QueryUnit.pas',
-  UpdatePws in 'UpdatePws.pas' {Form2};
+  UpdatePws in 'UpdatePws.pas' {Form2},
+  UnitUserParaManage in 'UnitUserParaManage.pas' {ParaManage};
 
 exports
   DllGetClassObject,

@@ -12,7 +12,8 @@ uses
 	Windows, ActiveX, Classes, ComObj, Shdocvw,dialogs,
 	ShlObj, controls, messages, Forms,Graphics,
 	ExtCtrls, mshtml, StdCtrls, ComCtrls, Menus, ToolWin,
-	ActnList, IniFiles, SQLiteTable3, DatabaseOpt, UnitPin, UnitSureSave;
+	ActnList, IniFiles, SQLiteTable3, DatabaseOpt, UnitPin, UnitSureSave,
+	UnitAutoFillChoose, UnitMultiUserChoose;
 
 const
 	DEBUG_MODE = True;
@@ -31,6 +32,7 @@ type
 		havepws,savepws:Boolean;
 		formPin: TFormPin;
 		formSureSave: TSureSave;
+	  MultiUserChoose: TMultiUserChoose;
 	protected
 		//IObjectWithSite接口方法定义
 		function SetSite(const pUnkSite: IUnknown): HResult; stdcall;
@@ -53,6 +55,7 @@ type
 
 //		procedure ProgressChange(Progress: Integer; ProgressMax: Integer);
 //		procedure ActionLoadExecute(const pDisp: IDispatch; var URL: OleVariant);
+		function AutoFillchoose:Boolean;
 		procedure ProgressChange;
 		procedure NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);
 //		procedure SubmitSave(var URL: OleVariant);
@@ -278,7 +281,9 @@ var
 	InputName, InputValue: string;
 	FormCount: Integer;
 	DatabaseOpt: TDatabaseOpt;
-	pws: TSQLIteTable;
+	pws,autofill: TSQLIteTable;
+	SQL:String;
+	username,userpassword: String;
 begin
 	for FormCount := 0 to HtmlForms.length - 1 do
 	begin
@@ -298,7 +303,10 @@ begin
 			try
 				DatabaseOpt := TDatabaseOpt.Create;
 				if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
-					pws := DatabaseOpt.SelectPws(HtmlDocument.url);
+				begin
+					SQL := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + HtmlDocument.url+'''';
+					pws := DatabaseOpt.Select(SQL);
+				end;
 				savepws := false;
 				if pws.Count > 0 then
 				begin
@@ -307,30 +315,66 @@ begin
 				if (InputElement.value = '') and savepws then       //获得焦点事件自动填入数据
 				begin
           
-					if Application.MessageBox('您是否要自动填入密码？','提示',MB_OKCANCEL) <> 1 then
-					begin
-						exit;
-					end;
+				if DatabaseOpt.OpenDatabase('config.dat','parameterinfo') then
+				begin
+					SQL := 'SELECT * FROM parameterinfo WHERE ParaName = ''autofill''';
+					autofill := DatabaseOpt.Select(SQL);
+				end;
+				if autofill.Count >0 then
+				begin
+					if autofill.FieldAsString(autofill.FieldIndex['ParaValue']) = 'N' then
+						if not AutoFillchoose then
+							exit;
+				end
+				else
+				begin
+						if not AutoFillchoose then
+							exit;
+				end;
 					formPin := TFormPin.Create(nil);         //Create input PIN form
 
 					if formPin.ShowModal2 = 1 then
 					begin
-						InputElement.Set_Value(pws.FieldAsString(pws.FieldIndex['UserPws']));
+						if pws.Count >1 then
+						begin
+							SQL := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + HtmlDocument.url+''' and DefaultFill =' +' ''Y'' ';
+							pws := DatabaseOpt.Select(SQL);
+							if pws.Count >0 then
+							begin
+								 username := pws.FieldAsString(pws.FieldIndex['UserName']);
+								 userpassword := pws.FieldAsString(pws.FieldIndex['UserPws']);
+							end
+							else
+							begin
+								MultiUserChoose := TMultiUserChoose.Create(nil);
+								MultiUserChoose.URL := HtmlDocument.url;
+								MultiUserChoose.ShowModal2;
+								username := MultiUserChoose.username;
+								userpassword := MultiUserChoose.userpassword;
+								MultiUserChoose.Free;
+							end;
+						end
+						else
+						begin
+								 username := pws.FieldAsString(pws.FieldIndex['UserName']);
+								 userpassword := pws.FieldAsString(pws.FieldIndex['UserPws']);
+            end;
+					InputElement.Set_Value(userpassword);
 						J := ItemName -1 ;
 						while J >= 0 do
 						begin
 							if Supports(HtmlForm.item(J, ItemIndex), IHTMLInputElement, InputElement1) then
 								if InputElement1.type_= 'text' then
 								begin
-									InputElement1.value := pws.FieldAsString(pws.FieldIndex['UserName']);
+									InputElement1.value := username;
 									break;
 								end;
 							J := J -1;
-						end;
+						end;       
 					end;
 					formPin.Free;
 				end;
-				if (InputElement.value <> '') and (not savepws) then    //提交事件，自动保存数据
+				if InputElement.value <> '' then    //提交事件，自动保存数据
 				begin
 					inputValue := InputElement.value;
 						J := ItemName -1 ;
@@ -344,12 +388,23 @@ begin
 								end;
 							J := J -1;
 						end;
+
+					SQL := 'SELECT * FROM pwsinfo ' + 'WHERE UserName = ''' + InputName+'''';
+					pws := DatabaseOpt.Select(SQL);
+					if pws.Count > 0 then
+					begin
+					exit;
+					end;
+
 					formSureSave := TSureSave.Create(nil);
 					DatabaseOpt := TDatabaseOpt.Create;
 					formSureSave.ShowModal2;
 					if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
 						if 	formSureSave.savetype <> '' then
-							DatabaseOpt.InsertList(HtmlDocument.url,HtmlForm.name,InputName,InputElement.value,formSureSave.savetype);
+						begin
+							SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+formSureSave.savetype+'","'+'N'+'");';
+							DatabaseOpt.Insert(SQL);
+						end;
 				end;
 			finally
 				DatabaseOpt.CloseDatabase;
@@ -358,6 +413,19 @@ begin
 		end;
 	end;
 	end;
+end;
+
+function TTIEAdvBHO.AutoFillchoose:Boolean;
+var
+	autofill: TAutoFill;
+begin
+	autofill := TAutoFill.Create(nil);
+	autofill.ShowModal2;
+	if autofill.res then
+		result := true
+	else
+		result := false;
+	autofill.Free;
 end;
 
 procedure TTIEAdvBHO.NavigateComplete2(const pDisp: IDispatch; var URL: OleVariant);

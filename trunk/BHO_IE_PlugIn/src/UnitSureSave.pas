@@ -61,9 +61,9 @@ begin
 
 	sqlstrdis := 'select distinct Type  from pwsinfo';
 	res := DataOpt.Select(sqlstrdis);
-  while not res.EOF do
+	while not res.EOF do
   begin
-    CombType.Items.Add(TRIM(res.Fields[0]));
+		CombType.Items.Add(TRIM(res.Fields[0]));
     res.Next;
 	end;
 end;

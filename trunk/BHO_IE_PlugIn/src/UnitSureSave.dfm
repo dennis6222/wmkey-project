@@ -26,7 +26,6 @@ object SureSave: TSureSave
     Color = clBtnHighlight
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 538
     object Label1: TLabel
       Left = 24
       Top = 56

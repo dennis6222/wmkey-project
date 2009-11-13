@@ -46,9 +46,11 @@ end;
 procedure TForm2.BtnOkClick(Sender: TObject);
 var
   res:TSQLIteTable;
-  showpws: String;
+	showpws: String;
+	SQL:String;
 begin
- 	res := DataOpt.SelectPws(URL);
+	SQL := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + URL+'''';
+	res := DataOpt.Select(SQL);
   if res.Count >0 then
   begin
     showpws := res.FieldAsString(res.FieldIndex['UserPws']);
@@ -66,10 +68,11 @@ begin
     EdtNewPwstwo.SelectAll;
     EdtNewPwstwo.SetFocus;
     exit;
-  end;
-  DataOpt.UpatePws(URL,EdtNewPwsone.Text);
+	end;
+	SQL :='update pwsinfo set UserPws = '''+ EdtNewPwsone.Text + '''Where Url = ''' + URL + '''';
+	DataOpt.Upate(SQL);
   showmessage('ÐÞ¸Ä³É¹¦£¡');
-  Close;
+	Close;
 end;
 
 procedure TForm2.FormCreate(Sender: TObject);

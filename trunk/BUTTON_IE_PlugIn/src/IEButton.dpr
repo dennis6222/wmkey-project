@@ -11,7 +11,12 @@ uses
   UnitPin in 'UnitPin.pas',
   QueryUnit in 'QueryUnit.pas',
   UpdatePws in 'UpdatePws.pas' {Form2},
-  UnitUserParaManage in 'UnitUserParaManage.pas' {ParaManage};
+  UnitUserParaManage in 'UnitUserParaManage.pas' {ParaManage},
+  cardopted in 'cardopted.pas',
+  PCSCconnector in 'PCSCconnector.pas',
+  SCardErr in 'SCardErr.pas',
+  WinSCard in 'WinSCard.pas',
+  WinSmCrd in 'WinSmCrd.pas';
 
 exports
   DllGetClassObject,

@@ -3,9 +3,9 @@ unit UnitPin;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+	Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
 //	Dialogs, StdCtrls, PwsManagement, VrControls, VrButtons,  ExtCtrls;
-	Dialogs, StdCtrls,  ExtCtrls, jpeg;
+	Dialogs, StdCtrls,  ExtCtrls, jpeg, cardopted;
 type
   TFormPin = class(TForm)
     Panel1: TPanel;
@@ -13,15 +13,19 @@ type
     Image1: TImage;
     Label4: TLabel;
     Label5: TLabel;
-    Label6: TLabel;
+    LabelCardState: TLabel;
     Label1: TLabel;
     Edit1: TEdit;
     Button1: TButton;
     Button2: TButton;
     Image3: TImage;
+    Timer1: TTimer;
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
 	private
     { Private declarations }
   public
@@ -31,6 +35,7 @@ type
 
 var
 	FormPin: TFormPin;
+	cardopt: TCardOpt;
 implementation
 
 uses
@@ -62,6 +67,17 @@ end;
 procedure TFormPin.Button2Click(Sender: TObject);
 begin
 	Close;
+end;
+
+procedure TFormPin.FormCreate(Sender: TObject);
+begin
+	cardopt := TCardOpt.Create;
+	Button1.Enabled := false;
+end;
+
+procedure TFormPin.FormDestroy(Sender: TObject);
+begin
+	cardopt.Free;
 end;
 
 procedure TFormPin.FormShow(Sender: TObject);
@@ -148,4 +164,18 @@ begin
   end;
 
 end;
+procedure TFormPin.Timer1Timer(Sender: TObject);
+begin
+	if cardopt.getCardList then
+	begin
+		LabelCardState.Caption := '“—≤Â»Î';
+		Timer1.Enabled := false;
+		Button1.Enabled := true;
+	end
+	else
+	begin
+		LabelCardState.Caption := 'Œ¥≤Â»Î';
+	end;
+end;
+
 end.

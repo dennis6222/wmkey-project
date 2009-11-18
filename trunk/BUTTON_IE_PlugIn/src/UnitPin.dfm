@@ -14,6 +14,8 @@ object FormPin: TFormPin
   Font.Style = []
   OldCreateOrder = False
   Position = poDesktopCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -607,7 +609,7 @@ object FormPin: TFormPin
       Font.Style = []
       ParentFont = False
     end
-    object Label6: TLabel
+    object LabelCardState: TLabel
       Left = 150
       Top = 80
       Width = 42
@@ -1112,7 +1114,7 @@ object FormPin: TFormPin
     end
     object Button1: TButton
       Left = 248
-      Top = 264
+      Top = 265
       Width = 75
       Height = 25
       Caption = #30830#23450
@@ -1142,5 +1144,11 @@ object FormPin: TFormPin
       TabOrder = 2
       OnClick = Button2Click
     end
+  end
+  object Timer1: TTimer
+    Interval = 10
+    OnTimer = Timer1Timer
+    Left = 376
+    Top = 56
   end
 end

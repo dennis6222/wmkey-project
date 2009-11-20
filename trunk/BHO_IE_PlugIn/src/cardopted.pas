@@ -2,7 +2,7 @@ unit cardopted;
 
 interface
 uses
-	Classes, PCSCconnector, StdCtrls,SysUtils;
+	Classes, PCSCconnector, StdCtrls,SysUtils, Windows;
 
 type TRaveByte = array[0..56] of Byte;
 type TCardOpt = Class
@@ -25,9 +25,12 @@ implementation
 		 inherited;
 		 readerPCSC := TReader_PCSC.Create;
 	 end;
-	function TCardOpt.getCardList:Boolean;
+function TCardOpt.getCardList:Boolean;
 var
 	 readerlist: TstringList;
+	 drvchar   :   char;
+	 drvtype   :   integer;
+	 s   :   string;
 begin
  {	 result := false;
 	 ReaderList:=TStringList.Create;
@@ -40,10 +43,20 @@ begin
 	 end
 	 else
 			result := false;    }
-	 if FileExists('c:/key.txt') then
-		 result := true
-	 else
- 		 result := false;
+	result := false;
+	for   drvchar:='C'   to   'Z'   do
+	begin
+		s := drvchar + ':\';
+		drvtype := GetDriveType(PChar(s));
+		if drvtype = DRIVE_REMOVABLE  then
+			if FileExists(s + 'key.txt') then
+			begin
+				 result := true;
+				 exit;
+			end
+			else
+				 result := false;
+	end;
  end;
  function TCardOpt.connCard:Boolean;
 	var

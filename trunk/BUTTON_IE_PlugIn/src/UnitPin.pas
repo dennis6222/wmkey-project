@@ -176,6 +176,7 @@ begin
 	begin
 		LabelCardState.Caption := 'Œ¥≤Â»Î';
 	end;
+	application.ProcessMessages;
 end;
 
 end.

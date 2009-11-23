@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2009-10-26 21:20:41.984.pas,C:\Documents and Settings\Administrator\桌面\IE 按钮\Unit1.pas=C:\Documents and Settings\Administrator\桌面\IE 按钮\PwsManagement.pas</Transaction>
+    <Transaction>2009-10-26 21:20:41.984.dfm,C:\Documents and Settings\Administrator\桌面\IE 按钮\Unit1.dfm=C:\Documents and Settings\Administrator\桌面\IE 按钮\PwsManagement.dfm</Transaction>
+    <Transaction>2009-10-27 09:44:04.640.pas,F:\IE 按钮\Unit2.pas=F:\IE 按钮\UnitPIN.pas</Transaction>
+    <Transaction>2009-10-27 09:44:04.640.dfm,F:\IE 按钮\Unit2.dfm=F:\IE 按钮\UnitPIN.dfm</Transaction>
+    <Transaction>2009-10-27 09:47:07.609.pas,F:\IE 按钮\UnitPIN.pas=</Transaction>
+    <Transaction>2009-10-27 09:47:07.609.dfm,F:\IE 按钮\UnitPIN.dfm=</Transaction>
+    <Transaction>2009-10-27 15:35:03.046.pas,F:\IE Button\Unit1.pas=F:\IE Button\QueryBuilder.pas</Transaction>
+    <Transaction>2009-10-27 15:49:36.437.pas,F:\IE Button\QueryBuilder.pas=</Transaction>
+    <Transaction>2009-10-27 15:50:00.296.pas,F:\IE Button\Unit1.pas=F:\IE Button\QueryUnit.pas</Transaction>
+    <Transaction>2009-11-01 15:12:55.609.pas,E:\IE Button\src\Unit2.pas=E:\IE Button\src\UpdatePws.pas</Transaction>
+    <Transaction>2009-11-01 15:12:55.609.dfm,E:\IE Button\src\Unit2.dfm=E:\IE Button\src\UpdatePws.dfm</Transaction>
+    <Transaction>2009-11-11 13:19:12.437.pas,F:\BUTTON_IE_PlugIn\src\UnitAutoFillChoose.pas=F:\BUTTON_IE_PlugIn\src\UnitUserParaManage.pas</Transaction>
+    <Transaction>2009-11-11 13:19:12.437.dfm,F:\BUTTON_IE_PlugIn\src\UnitAutoFillChoose.dfm=F:\BUTTON_IE_PlugIn\src\UnitUserParaManage.dfm</Transaction>
+  </Transactions>
+</BorlandProject>

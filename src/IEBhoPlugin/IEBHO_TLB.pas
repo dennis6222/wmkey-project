@@ -12,10 +12,10 @@ unit IEBHO_TLB;
 // ************************************************************************ //
 
 // $Rev: 8291 $
-// File generated on 2009-11-20 17:21:28 from Type Library described below.
+// File generated on 2009-11-24 16:29:53 from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: F:\mywork\Project1\src\IEBhoPlugin\IEBHO.tlb (1)
+// Type Lib: F:\mywork\Project\src\IEBhoPlugin\IEBHO.tlb (1)
 // LIBID: {AC166DD1-E716-4ACC-8DAC-CA805486AB5F}
 // LCID: 0
 // Helpfile: 

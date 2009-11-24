@@ -401,10 +401,10 @@ begin
 					formSureSave.ShowModal2;
 					if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
 						if 	formSureSave.savetype <> '' then
-						begin
-							SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+formSureSave.savetype+'","'+'N'+'");';
-							DatabaseOpt.Insert(SQL);
-						end;
+							SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+formSureSave.savetype+'","'+'N'+'");'
+						else
+							SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+'N'+'");';
+						DatabaseOpt.Insert(SQL);
 				end;
 			finally
 				DatabaseOpt.CloseDatabase;

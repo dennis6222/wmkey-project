@@ -43,10 +43,15 @@ end;
 
 procedure TSureSave.BtnOKClick(Sender: TObject);
 begin
-	if CombType.Text <> '' then
-  begin
+//	if CombType.Text <> '' then
+//  begin
 		 savetype := CombType.Text;
-	end;
+//	end
+//	else
+//  begin
+//		showmessage('分类不能为空，请填写分类！');
+//		exit;
+//  end;
 ModalResult := mrCancel;
 Close;
 end;
@@ -62,8 +67,9 @@ begin
 	sqlstrdis := 'select distinct Type  from pwsinfo';
 	res := DataOpt.Select(sqlstrdis);
 	while not res.EOF do
-  begin
-		CombType.Items.Add(TRIM(res.Fields[0]));
+	begin
+		if res.Fields[0] <> ''  then
+			CombType.Items.Add(TRIM(res.Fields[0]));
     res.Next;
 	end;
 end;

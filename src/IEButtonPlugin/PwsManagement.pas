@@ -228,8 +228,9 @@ begin
   mainnode := TreeViewType.Items.Add(nil,'全部分类');
 
   while not res.EOF do
-  begin
-    TreeViewType.Items.AddChild(mainnode,TRIM(res.Fields[0]));
+	begin
+		if res.Fields[0] <> ''  then
+	    TreeViewType.Items.AddChild(mainnode,TRIM(res.Fields[0]));
     res.Next;
   end;
 

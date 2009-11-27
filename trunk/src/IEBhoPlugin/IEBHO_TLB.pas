@@ -12,7 +12,7 @@ unit IEBHO_TLB;
 // ************************************************************************ //
 
 // $Rev: 8291 $
-// File generated on 2009-11-24 16:29:53 from Type Library described below.
+// File generated on 2009-11-26 13:11:28 from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: F:\mywork\Project\src\IEBhoPlugin\IEBHO.tlb (1)

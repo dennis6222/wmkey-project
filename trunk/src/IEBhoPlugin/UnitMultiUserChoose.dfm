@@ -1010,8 +1010,8 @@ object MultiUserChoose: TMultiUserChoose
     TabOrder = 2
   end
   object ListViewUser: TListView
-    Left = 80
-    Top = 84
+    Left = 74
+    Top = 76
     Width = 185
     Height = 104
     Columns = <>
@@ -1021,7 +1021,7 @@ object MultiUserChoose: TMultiUserChoose
     RowSelect = True
     SmallImages = ImageList1
     TabOrder = 3
-    ViewStyle = vsList
+    ViewStyle = vsSmallIcon
   end
   object ImageList1: TImageList
     Left = 296

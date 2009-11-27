@@ -940,11 +940,11 @@ object ParaManage: TParaManage
         B876F96296BBFD3FC314363A9C52DE2AD77C55C7A1C55AFE5C55762AFF00FFD9}
     end
     object CheckBoxFill: TCheckBox
-      Left = 40
+      Left = 39
       Top = 59
       Width = 137
       Height = 17
-      Caption = #33258#21160#22635#20837#25552#31034
+      Caption = #26174#31034#33258#21160#22635#20837#26694
       TabOrder = 0
     end
     object BtnOK: TButton

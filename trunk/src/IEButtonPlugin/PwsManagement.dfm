@@ -5,7 +5,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu]
   Caption = #23494#30721#31649#29702
   ClientHeight = 526
-  ClientWidth = 848
+  ClientWidth = 849
   Color = clBtnHighlight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,7 +22,7 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 848
+    Width = 849
     Height = 526
     BorderStyle = bsSingle
     Color = clBtnHighlight
@@ -1125,7 +1125,7 @@ object Form1: TForm1
     object ListView1: TListView
       Left = 207
       Top = 75
-      Width = 631
+      Width = 638
       Height = 359
       Columns = <
         item
@@ -1149,12 +1149,12 @@ object Form1: TForm1
           Width = 100
         end
         item
-          Caption = #22791#27880'1'
+          Caption = #23384#20648#20998#31867
           Width = 80
         end
         item
-          Caption = #22791#27880'2'
-          Width = 80
+          Caption = #40664#35748#29992#25143
+          Width = 100
         end>
       Ctl3D = True
       Font.Charset = DEFAULT_CHARSET

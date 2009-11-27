@@ -26,6 +26,7 @@ type
 		{ Public declarations }
  		res: Boolean;
 		function ShowModal2:Integer;
+		procedure upautofill(showauto,autof:String);
   end;
 
 var
@@ -36,30 +37,30 @@ implementation
 
 {$R *.dfm}
 
-
-procedure TAutoFill.BtnChanleClick(Sender: TObject);
-begin
-  res := false;
-	Close;
-end;
-
-procedure TAutoFill.BtnOKClick(Sender: TObject);
+procedure TAutoFill.upautofill(showauto,autof:String);
 var
 	SQL: String;
 	autofill: TSQLIteTable;
 begin
 	if checkboxfill.Checked then
 	begin
-		SQL := 'SELECT * FROM parameterinfo WHERE ParaName = ''autofill''';
+		SQL := 'SELECT * FROM parameterinfo WHERE UserName is null';
 		autofill := DataOpt.Select(SQL);
 		if autofill.Count >0 then
-			SQL := 'update parameterinfo set ParaValue = ''Y'' Where ParaName = ''autofill'''
-		else
-			SQL := 'INSERT INTO parameterinfo(UserName,ParaName,ParaValue) VALUES ("","autofill","Y");';
+			SQL := 'update parameterinfo set Showauto = '''+showauto+''', Autofill = '''+autof+''' Where UserName is null' ;
 		DataOpt.Upate(SQL);
 	end;
+end;
+procedure TAutoFill.BtnChanleClick(Sender: TObject);
+begin
+	upautofill('Y','N');
+  res := false;
+	Close;
+end;
 
-
+procedure TAutoFill.BtnOKClick(Sender: TObject);
+begin
+	upautofill('Y','Y');
 	res := true;
 	Close
 end;

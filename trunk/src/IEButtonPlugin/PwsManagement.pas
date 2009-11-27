@@ -104,28 +104,25 @@ begin
   begin
     showmessage('您没有选择记录，请您选择');
     exit;
-  end;
-	if Assigned(formPin) then
-	begin
+	end;
 		formPin := TFormPin.Create(nil);
-    formPin.ShowModal2;
-    if formPin.ModalResult = 1 then
-    begin
-    	if ListView1.Selected <> nil then
-    	begin
-    		index := ListView1.Selected.Index;
+   formPin.ShowModal2;
+		if formPin.ModalResult = 1 then
+		begin
+     	if ListView1.Selected <> nil then
+			begin
+   		index := ListView1.Selected.Index;
 				URL := listview1.Items[index].SubItems.strings[0]; //读第i行第1列
 				SQL := 'SELECT * FROM pwsinfo ' + 'WHERE Url = ''' + URL+'''';
 				res := DataOpt.Select(SQL);
 				if res.Count >0 then
         begin
           showpws := res.FieldAsString(res.FieldIndex['UserPws']);
-          showmessage('user password: ' + showpws);
-        end;
-  	  end;
-    end;
-    formPin.Free;
-	end;
+					showmessage('user password: ' + showpws);
+				end;  
+			end;  
+		end;
+//	formPin.free;
 end;
 procedure TForm1.updatepws;
 var
@@ -225,7 +222,7 @@ begin
 
 	sqlstrdis := 'select distinct Type  from pwsinfo';
   res := DataOpt.Select(sqlstrdis);
-  mainnode := TreeViewType.Items.Add(nil,'全部分类');
+  mainnode := TreeViewType.Items.Add(nil,'根分类');
 
   while not res.EOF do
 	begin
@@ -311,7 +308,7 @@ begin
   if TreeViewType.Selected.Level = 0 then
   begin
     typestr := TreeViewType.Items.Item[TreeViewType.Selected.Index].Text;
-  	sqlstr := 'select * from pwsinfo';
+  	sqlstr := 'select * from pwsinfo where Type is null';
   end
   else
   begin

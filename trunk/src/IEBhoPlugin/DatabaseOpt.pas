@@ -78,12 +78,12 @@ begin
 		if not sldb.TableExists(TableName) then
 		begin
 			sSQL := 'CREATE TABLE parameterinfo ([ID] INTEGER PRIMARY KEY,';
-			sSQL := sSQL + '[UserName] VARCHAR (50),[ParaName] VARCHAR (100),[ParaValue] VARCHAR (100));';
+			sSQL := sSQL + '[UserName] VARCHAR (50),[Showauto] VARCHAR (10),[Autofill] VARCHAR (10));';
 			sldb.execsql(sSQL);
 			sldb.execsql('CREATE INDEX ParameterInfoName ON [pwsinfo]([ID]);');
 
-//			sSQL := 'INSERT INTO parameterinfo(UserName,ParaName,ParaValue) VALUES ("","autofill","N");';
-//			sldb.ExecSQL(sSQL);
+			sSQL := 'INSERT INTO parameterinfo(Showauto,Autofill) VALUES ("N","N");';
+			sldb.ExecSQL(sSQL);
 		end;
 	end;
 	result := true;

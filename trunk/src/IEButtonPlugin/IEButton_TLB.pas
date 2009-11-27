@@ -12,7 +12,7 @@ unit IEButton_TLB;
 // ************************************************************************ //
 
 // $Rev: 8291 $
-// File generated on 2009-11-26 17:30:32 from Type Library described below.
+// File generated on 2009-11-27 11:34:00 from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: F:\mywork\Project\src\IEButtonPlugin\IEButton.tlb (1)

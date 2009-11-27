@@ -177,20 +177,24 @@ var
 	USER_TABLE: String;
 	qb: TQueryBuilder;
 	item,aItem: TQueryItem;
+	urlstr: String;
 begin
-  if Editschurl.Text = '' then
-    	sqlstr := 'select * from pwsinfo'
-  else
-  begin
+	urlstr := Editschurl.Text;
+	if urlstr = '' then
+			sqlstr := 'select * from pwsinfo'
+	else
+	begin
+
+	urlstr   :=   StringReplace(urlstr,'''','"',[rfReplaceAll]);
 //----------------------------------------- //…˙≥…SQL”Ôæ‰
 		USER_TABLE := 'pwsinfo';
-    qb := TQueryBuilder.Create;
+		qb := TQueryBuilder.Create;
 		qb.setTableName(USER_TABLE);
 
 		item := TQueryItem.Create;
 		aItem := TQueryItemofString.Create('URL');
 		aItem.setLike;
-		aItem.setValue(Editschurl.Text);
+		aItem.setValue(urlstr);
 		qb.add(aItem);
  //    showmessage(qb.toString);
 
@@ -199,12 +203,12 @@ begin
 		 aItem.Destroy;
 
 //-----------------------------------------
-  	sqlstr := qb.toString('sql');
-    qb.Free;
-  end;
+		sqlstr := qb.toString('sql');
+		qb.Free;
+	end;
 	checkuser(sqlstr);    //œ‘ æ
 
-	
+
 
 end;
 

@@ -1219,6 +1219,10 @@ object Form1: TForm1
         Caption = #21024#38500'(&D)'
         OnClick = N5Click
       end
+      object N15: TMenuItem
+        Caption = #21024#38500#20840#37096#65288'&A'#65289
+        OnClick = N15Click
+      end
       object N12: TMenuItem
         Caption = '-'
       end
@@ -1248,6 +1252,10 @@ object Form1: TForm1
     object N10: TMenuItem
       Caption = #21024#38500
       OnClick = N10Click
+    end
+    object N14: TMenuItem
+      Caption = #21024#38500#20840#37096
+      OnClick = N14Click
     end
   end
 end

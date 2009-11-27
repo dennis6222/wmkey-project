@@ -31,6 +31,8 @@ type
     N6: TMenuItem;
     N12: TMenuItem;
     N13: TMenuItem;
+    N14: TMenuItem;
+    N15: TMenuItem;
 		procedure checkuser(Sqlstr: String);
     procedure ListView1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -39,7 +41,8 @@ type
     procedure TreeViewTypeClick(Sender: TObject);
     procedure N10Click(Sender: TObject);
     procedure N11Click(Sender: TObject);
-    procedure delrow;
+		procedure delrow;
+		procedure delall;
     procedure showpws;
     procedure updatepws;
     procedure N5Click(Sender: TObject);
@@ -48,6 +51,8 @@ type
     procedure N9Click(Sender: TObject);
     procedure N4Click(Sender: TObject);
     procedure N13Click(Sender: TObject);
+    procedure N14Click(Sender: TObject);
+    procedure N15Click(Sender: TObject);
   private
 		{ Private declarations }
   public
@@ -90,6 +95,17 @@ begin
 		end;
 	end;
 
+end;
+procedure TForm1.delall;
+var
+	SQL: String;
+begin
+  		if Application.MessageBox('您是否确定要删除全部数据？','提示',MB_OKCANCEL) = 1 then
+		begin
+			SQL := 'delete from pwsinfo';
+			DataOpt.Delete(SQL);
+			checkuser(sqlstr);
+		end;
 end;
 procedure TForm1.showpws;
 var
@@ -280,6 +296,16 @@ begin
 	ParaManage := TParaManage.Create(nil);
 	ParaManage.ShowModal;
 	checkuser(sqlstr);
+end;
+
+procedure TForm1.N14Click(Sender: TObject);
+begin
+delall;
+end;
+
+procedure TForm1.N15Click(Sender: TObject);
+begin
+delall;
 end;
 
 procedure TForm1.N4Click(Sender: TObject);

@@ -180,11 +180,10 @@
 			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
 		</VersionInfoKeys>
-		<buildevents/>  <Excluded_Packages>
-      
-      
+		<buildevents/>
+		<Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\Bin\dclib100.bpl">Borland InterBase Express Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\Bin\dclintraweb_90_100.bpl">VCL for the Web 9.0 Design Package for CodeGear RAD Studio</Excluded_Packages>
     </Excluded_Packages>
-  </Delphi.Personality>
+	</Delphi.Personality>
 </BorlandProject>

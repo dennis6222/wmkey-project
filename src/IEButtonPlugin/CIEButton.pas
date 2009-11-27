@@ -57,7 +57,7 @@ begin
    		pwsform :=TForm1.Create(nil);
   		pwsform.ShowModal;
 		end;
-		formPin.Free;
+ 		formPin.Free;
 //	end;
 
 end;

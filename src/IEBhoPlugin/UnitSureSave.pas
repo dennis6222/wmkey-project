@@ -25,6 +25,7 @@ type
 	public
 		{ Public declarations }
 		savetype: String;
+		rest:Boolean;
 		function ShowModal2:Integer;
 	end;
 
@@ -38,22 +39,15 @@ implementation
 
 procedure TSureSave.BtnChanelClick(Sender: TObject);
 begin
+	rest := false;
 	Close;
 end;
 
 procedure TSureSave.BtnOKClick(Sender: TObject);
 begin
-//	if CombType.Text <> '' then
-//  begin
-		 savetype := CombType.Text;
-//	end
-//	else
-//  begin
-//		showmessage('分类不能为空，请填写分类！');
-//		exit;
-//  end;
-ModalResult := mrCancel;
-Close;
+	savetype := CombType.Text;
+	rest := true;
+	Close;
 end;
 
 procedure TSureSave.FormCreate(Sender: TObject);
@@ -61,6 +55,7 @@ var
 	res: TSQLIteTable;
 	sqlstrdis: String;
 begin
+	rest :=false;
 	DataOpt := TDatabaseOpt.Create;
 	DataOpt.OpenDatabase('config.dat','pwsinfo');
 

@@ -46,31 +46,20 @@ var
 	SQL: String;
 	autofill: TSQLIteTable;
 begin
-	SQL := 'SELECT * FROM parameterinfo WHERE ParaName = ''autofill''';
+	SQL := 'SELECT * FROM parameterinfo WHERE UserName is null';
 	autofill := DataOpt.Select(SQL);
 	if checkboxfill.Checked then
 	begin
 		if autofill.Count >0 then
-			SQL := 'update parameterinfo set ParaValue = ''Y'' Where ParaName = ''autofill'''
-		else
-			SQL := 'INSERT INTO parameterinfo(UserName,ParaName,ParaValue) VALUES ("","autofill","Y");';
+			SQL := 'update parameterinfo set Showauto = ''N'', Autofill = ''N'' Where UserName is null' ;
 		DataOpt.Upate(SQL);
-	end
-	else
-	begin
-		if autofill.Count >0 then
-			SQL := 'update parameterinfo set ParaValue = ''N'' Where ParaName = ''autofill'''
-		else
-			SQL := 'INSERT INTO parameterinfo(UserName,ParaName,ParaValue) VALUES ("","autofill","N");';
-		DataOpt.Upate(SQL);
+	end;
 
 	if CheckBoxDefault.Checked then
 	begin
 		SQL := 'update pwsinfo set DefaultFill = ''N'' ';
 		DataOpt.Upate(SQL);
   end;
-  end;
-
 
 	res := true;
 	Close
@@ -82,19 +71,18 @@ var
 	autofill,defaultuser: TSQLIteTable;
 begin
 	DataOpt := TDatabaseOpt.Create;
-	DataOpt.OpenDatabase('config.dat','parameterinfo');
 	if DataOpt.OpenDatabase('config.dat','parameterinfo') then
 	begin
-		SQL := 'SELECT * FROM parameterinfo WHERE ParaName = ''autofill''';
+		SQL := 'SELECT * FROM parameterinfo WHERE UserName is null';
 		autofill := DataOpt.Select(SQL);
 		SQL := 'SELECT * FROM pwsinfo WHERE DefaultFill = ''Y''';
 		defaultuser := DataOpt.Select(SQL);
 	end;
 	if autofill.Count >0 then
-		if autofill.FieldAsString(autofill.FieldIndex['ParaValue']) = 'Y' then
-			CheckBoxFill.Checked := true;
+		if autofill.FieldAsString(autofill.FieldIndex['Showauto']) = 'N' then
+			CheckBoxFill.Enabled := false;
 	if defaultuser.Count = 0 then
-    CheckBoxDefault.Enabled := false;
+		CheckBoxDefault.Enabled := false;
 end;
 
 procedure TParaManage.FormDestroy(Sender: TObject);

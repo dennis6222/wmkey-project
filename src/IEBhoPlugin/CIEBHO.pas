@@ -314,16 +314,19 @@ begin
 				end;
 				if (InputElement.value = '') and savepws then       //获得焦点事件自动填入数据
 				begin
-          
+
 				if DatabaseOpt.OpenDatabase('config.dat','parameterinfo') then
 				begin
-					SQL := 'SELECT * FROM parameterinfo WHERE ParaName = ''autofill''';
+					SQL := 'SELECT * FROM parameterinfo WHERE UserName is null';
 					autofill := DatabaseOpt.Select(SQL);
 				end;
 				if autofill.Count >0 then
 				begin
-					if autofill.FieldAsString(autofill.FieldIndex['ParaValue']) = 'N' then
+					if autofill.FieldAsString(autofill.FieldIndex['Showauto']) = 'N' then
 						if not AutoFillchoose then
+							exit;
+					if autofill.FieldAsString(autofill.FieldIndex['Showauto']) = 'Y' then
+						if autofill.FieldAsString(autofill.FieldIndex['Autofill']) = 'N' then
 							exit;
 				end
 				else
@@ -399,13 +402,16 @@ begin
 					formSureSave := TSureSave.Create(nil);
 					DatabaseOpt := TDatabaseOpt.Create;
 					formSureSave.ShowModal2;
-					if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
-						if 	formSureSave.savetype <> '' then
-							SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+formSureSave.savetype+'","'+'N'+'");'
-						else
-							SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+'N'+'");';
-						DatabaseOpt.Insert(SQL);
-				end;
+					if formSureSave.rest then
+					begin
+						if DatabaseOpt.OpenDatabase('config.dat','pwsinfo') then
+							if 	formSureSave.savetype <> '' then
+								SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,Type,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+formSureSave.savetype+'","'+'N'+'");'
+							else
+								SQL := 'INSERT INTO pwsinfo(URL,FormName,UserName,UserPws,DefaultFill) VALUES ("'+HtmlDocument.url+'","'+HtmlForm.name+'","'+InputName+'","'+InputElement.value+'","'+'N'+'");';
+							DatabaseOpt.Insert(SQL);
+          end;
+					end;
 			finally
 				DatabaseOpt.CloseDatabase;
 			end;
